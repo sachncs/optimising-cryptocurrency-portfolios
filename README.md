@@ -1,7 +1,7 @@
 # Crypto Portfolio System
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![CI](https://github.com/sachn-cs/optimising-cryptocurrency-portfolios/actions/workflows/ci.yml/badge.svg)](https://github.com/sachn-cs/optimising-cryptocurrency-portfolios/actions/workflows/ci.yml)
+[![CI](https://github.com/sachncs/optimising-cryptocurrency-portfolios/actions/workflows/ci.yml/badge.svg)](https://github.com/sachncs/optimising-cryptocurrency-portfolios/actions/workflows/ci.yml)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 
 Production-hardened implementation of the framework in [arXiv:2505.24831v2](https://arxiv.org/abs/2505.24831v2) for cryptocurrency portfolio construction through consensus clustering.
@@ -20,7 +20,7 @@ Production-hardened implementation of the framework in [arXiv:2505.24831v2](http
 ## Installation
 
 ```bash
-git clone https://github.com/sachn-cs/optimising-cryptocurrency-portfolios.git
+git clone https://github.com/sachncs/optimising-cryptocurrency-portfolios.git
 cd optimising-cryptocurrency-portfolios
 pip install -e ".[dev]"
 ```
@@ -102,6 +102,9 @@ optimising-cryptocurrency-portfolios/
 ├── docs/              # Documentation
 │   ├── architecture.md
 │   ├── api.md
+│   ├── deployment.md
+│   ├── faq.md
+│   ├── getting-started.md
 │   └── production-readiness.md
 └── pyproject.toml     # Project configuration
 ```

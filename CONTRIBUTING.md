@@ -41,7 +41,7 @@ Feature suggestions are welcome. Please provide:
 ### Setup
 
 ```bash
-git clone https://github.com/sachn-cs/optimising-cryptocurrency-portfolios.git
+git clone https://github.com/sachncs/optimising-cryptocurrency-portfolios.git
 cd optimising-cryptocurrency-portfolios
 pip install -e ".[dev]"
 ```

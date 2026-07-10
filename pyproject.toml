@@ -10,7 +10,7 @@ readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.10"
 authors = [
-  {name = "sachn-cs"}
+  {name = "sachin", email = "sachncs@gmail.com"}
 ]
 keywords = ["cryptocurrency", "portfolio", "optimization", "consensus-clustering", "finance"]
 classifiers = [
@@ -41,10 +41,10 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/sachn-cs/optimising-cryptocurrency-portfolios"
-Repository = "https://github.com/sachn-cs/optimising-cryptocurrency-portfolios"
-Issues = "https://github.com/sachn-cs/optimising-cryptocurrency-portfolios/issues"
-Changelog = "https://github.com/sachn-cs/optimising-cryptocurrency-portfolios/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/sachncs/optimising-cryptocurrency-portfolios"
+Repository = "https://github.com/sachncs/optimising-cryptocurrency-portfolios"
+Issues = "https://github.com/sachncs/optimising-cryptocurrency-portfolios/issues"
+Changelog = "https://github.com/sachncs/optimising-cryptocurrency-portfolios/blob/main/CHANGELOG.md"
 
 [project.scripts]
 crypto-portfolio = "cps.cli:main"
