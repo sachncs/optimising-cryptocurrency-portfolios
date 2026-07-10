@@ -8,7 +8,6 @@
   <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue" alt="Python"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green" alt="License"></a>
   <a href="https://github.com/sachncs/optimising-cryptocurrency-portfolios/actions"><img src="https://img.shields.io/github/actions/workflow/status/sachncs/optimising-cryptocurrency-portfolios/ci.yml?branch=master" alt="CI"></a>
-  <a href="https://pypi.org/project/crypto-portfolio-system/"><img src="https://img.shields.io/pypi/v/crypto-portfolio-system" alt="PyPI"></a>
   <a href="https://github.com/sachncs/optimising-cryptocurrency-portfolios/stargazers"><img src="https://img.shields.io/github/stars/sachncs/optimising-cryptocurrency-portfolios" alt="Stars"></a>
 </p>
 
