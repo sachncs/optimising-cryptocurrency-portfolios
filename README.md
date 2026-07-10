@@ -1,21 +1,39 @@
+<div align="center">
+
 # Crypto Portfolio System
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![CI](https://github.com/sachncs/optimising-cryptocurrency-portfolios/actions/workflows/ci.yml/badge.svg)](https://github.com/sachncs/optimising-cryptocurrency-portfolios/actions/workflows/ci.yml)
-[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+**Consensus-clustered cryptocurrency portfolio construction.**
 
-Production-hardened implementation of the framework in [arXiv:2505.24831v2](https://arxiv.org/abs/2505.24831v2) for cryptocurrency portfolio construction through consensus clustering.
+<p>
+  <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue" alt="Python"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green" alt="License"></a>
+  <a href="https://github.com/sachncs/optimising-cryptocurrency-portfolios/actions"><img src="https://img.shields.io/github/actions/workflow/status/sachncs/optimising-cryptocurrency-portfolios/ci.yml?branch=master" alt="CI"></a>
+  <a href="https://pypi.org/project/crypto-portfolio-system/"><img src="https://img.shields.io/pypi/v/crypto-portfolio-system" alt="PyPI"></a>
+  <a href="https://github.com/sachncs/optimising-cryptocurrency-portfolios/stargazers"><img src="https://img.shields.io/github/stars/sachncs/optimising-cryptocurrency-portfolios" alt="Stars"></a>
+</p>
+
+</div>
+
+---
+
+**Crypto Portfolio System** is a production-hardened implementation of the framework in
+[arXiv:2505.24831v2](https://arxiv.org/abs/2505.24831v2) for cryptocurrency portfolio
+construction through consensus clustering.
+
+It ingests price data, forecasts returns, builds rolling correlation networks, extracts
+stable asset clusters via consensus Louvain community detection, then performs Sharpe-ratio
+portfolio optimization with covariance regularization, risk limits, and execution costs.
 
 ## Features
 
-- **Return Forecasting** - Naive and ARIMA-based return prediction
-- **Correlation Networks** - Rolling correlation matrices with Louvain community detection
-- **Consensus Clustering** - Stable cluster extraction across multiple runs
-- **Portfolio Optimization** - Sharpe-ratio maximization with covariance regularization
-- **Risk Management** - Asset count limits, per-asset caps, volatility ceilings
-- **Execution Modeling** - Transaction costs and slippage applied to net returns
-- **Production Controls** - Retry logic, idempotent runs, structured logging
-- **Governance** - Forecast drift detection and MSE tracking
+- **Return Forecasting** — Naive and ARIMA-based return prediction
+- **Correlation Networks** — Rolling correlation matrices with Louvain community detection
+- **Consensus Clustering** — Stable cluster extraction across multiple runs
+- **Portfolio Optimization** — Sharpe-ratio maximization with covariance regularization
+- **Risk Management** — Asset count limits, per-asset caps, volatility ceilings
+- **Execution Modeling** — Transaction costs and slippage applied to net returns
+- **Production Controls** — Retry logic, idempotent runs, structured logging
+- **Governance** — Forecast drift detection and MSE tracking
 
 ## Installation
 
@@ -131,14 +149,14 @@ make help        # Show all commands
 ## Tech Stack
 
 - **Python 3.10+**
-- **NumPy** - Numerical computation
-- **pandas** - Data manipulation
-- **NetworkX** - Graph algorithms
-- **statsmodels** - Statistical models (ARIMA)
-- **pytest** - Testing framework
-- **ruff** - Linting and formatting
-- **mypy** - Static type checking
-- **pre-commit** - Git hooks
+- **NumPy** — Numerical computation
+- **pandas** — Data manipulation
+- **NetworkX** — Graph algorithms
+- **statsmodels** — Statistical models (ARIMA)
+- **pytest** — Testing framework
+- **ruff** — Linting and formatting
+- **mypy** — Static type checking
+- **pre-commit** — Git hooks
 
 ## Roadmap
 
