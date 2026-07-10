@@ -20,15 +20,65 @@ crypto-portfolio \
   --seed 42
 ```
 
-## Docker (Planned)
+## Docker
 
-```dockerfile
-FROM python:3.12-slim
-WORKDIR /app
-COPY . .
-RUN pip install .
-ENTRYPOINT ["crypto-portfolio"]
+A production multi-stage image is provided at the repository root.
+
+### Build
+
+```bash
+docker build -t crypto-portfolio-system:0.1.0 .
 ```
+
+The build stage compiles a wheel and installs it into a clean `python:3.12-slim`
+runtime image. The image runs as a non-root user (`uid=10001`, `cps`).
+
+### Run (synthetic data, default)
+
+```bash
+docker run --rm crypto-portfolio-system:0.1.0
+```
+
+### Run with persistent outputs
+
+```bash
+docker run --rm \
+  -v "$PWD/outputs:/data/outputs" \
+  -v "$PWD/runs:/data/runs" \
+  crypto-portfolio-system:0.1.0
+```
+
+### Run with custom CSV input
+
+```bash
+docker run --rm \
+  -v "$PWD/prices.csv:/home/cps/prices.csv:ro" \
+  -v "$PWD/outputs:/data/outputs" \
+  -v "$PWD/runs:/data/runs" \
+  crypto-portfolio-system:0.1.0 \
+  --prices-csv /home/cps/prices.csv --date-col date
+```
+
+### Inspect the image
+
+```bash
+docker run --rm --entrypoint python crypto-portfolio-system:0.1.0 -m pip list
+docker run --rm --entrypoint crypto-portfolio crypto-portfolio-system:0.1.0 --help
+```
+
+### Image details
+
+- Base: `python:3.12-slim`
+- Entrypoint: `crypto-portfolio`
+- Working directory: `/home/cps`
+- Volume mounts: `/data/outputs`, `/data/runs`
+- User: non-root `cps` (uid 10001)
+- Optional extras (e.g. `forecast-lstm`, `api`, `realtime`) are **not** installed in
+  the default image to keep it small. Build a variant image to include them:
+
+  ```bash
+  docker build --build-arg CPS_EXTRAS="forecast-lstm api" -t crypto-portfolio-system:all .
+  ```
 
 ## Environment Considerations
 
