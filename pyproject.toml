@@ -37,7 +37,8 @@ dev = [
   "pytest-cov>=4.1",
   "mypy>=1.10",
   "ruff>=0.5",
-  "pre-commit>=3.7"
+  "pre-commit>=3.7",
+  "numpy<2.1",
 ]
 
 [project.urls]
