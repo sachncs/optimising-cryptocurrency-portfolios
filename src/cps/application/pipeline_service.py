@@ -44,7 +44,6 @@ from ..domain import (
     RiskLimits,
     RunArtifacts,
     ScenarioKey,
-    Weights,
     build_weighted_graph_from_distance,
     consensus_similarity_matrix,
     correlation_distance_matrix,
@@ -126,7 +125,6 @@ class PipelineService:
         )
         returns = log_returns(cleaned_prices)
         market_returns = market_proxy(returns)
-        governance = self.__context.governance
 
         cost_config = ExecutionCostConfig(
             transaction_cost_bps=self.__config.transaction_cost_bps,

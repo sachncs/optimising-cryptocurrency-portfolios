@@ -222,16 +222,6 @@ class CovarianceMatrix:
         return pd.DataFrame(data, index=list(self.assets), columns=list(self.assets))
 
 
-def freeze_trades(trades: list["PortfolioResult"]) -> tuple["PortfolioResult", ...]:  # type: ignore[name-defined]  # noqa: F821
-    """Convert a list of trades into an immutable tuple."""
-    return tuple(trades)
-
-
-def freeze_summary(summary: list["EvaluationSummary"]) -> tuple["EvaluationSummary", ...]:  # type: ignore[name-defined]  # noqa: F821
-    """Convert a list of summaries into an immutable tuple."""
-    return tuple(summary)
-
-
 def freeze_similarity_matrices(
     matrices: dict[str, np.ndarray],
 ) -> Mapping[str, np.ndarray]:

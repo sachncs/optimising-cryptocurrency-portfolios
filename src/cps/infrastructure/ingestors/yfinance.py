@@ -7,7 +7,7 @@ symbol, all values strictly positive.
 from __future__ import annotations
 
 from collections.abc import Sequence
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import ClassVar, Literal
 
 import pandas as pd

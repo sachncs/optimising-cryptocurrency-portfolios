@@ -344,7 +344,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     )
     metrics_registry.record_timing_millis("pipeline_duration_millis", timer.elapsed_millis())
 
-    artifact_store.write_run(  # noqa: F841 (artifact_paths canonical layout; persisted by write_run)
+    artifact_store.write_run(
         run_id,
         result.artifacts,
         metrics=asdict_payload(metrics_registry.snapshot()),
@@ -403,11 +403,13 @@ def _capture_events(sink: list) -> Callable[[PipelineEvent, EventPayload], None]
     return listener
 
 
-def asdict_payload(snapshot: "MetricsSnapshot") -> dict[str, object]:  # type: ignore[name-defined]  # MetricsSnapshot re-exported from cps.infrastructure.observability.metrics
+def asdict_payload(snapshot: object) -> dict[str, object]:
     """Convert a :class:`MetricsSnapshot` to a JSON-ready dict."""
     from dataclasses import asdict
 
-    return dict[str, object](asdict(snapshot))
+    # snapshot is the MetricsSnapshot dataclass at runtime; the
+    # generic ``object`` annotation lets callers pass any dataclass.
+    return dict[str, object](asdict(snapshot))  # type: ignore[call-overload]  # snapshot is a dataclass instance
 
 
 # ----------------------------------------------------------------------
