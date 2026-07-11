@@ -82,22 +82,23 @@ docker run --rm --entrypoint crypto-portfolio crypto-portfolio-system:0.1.0 --he
 
 ## REST API
 
-The FastAPI surface (`cps.api`) is stateless. Run it with uvicorn:
+The FastAPI surface (`cps.interface.api`) is stateless. Run it with
+uvicorn:
 
 ```bash
 pip install -e ".[api]"
-uvicorn cps.api:create_app --factory --host 0.0.0.0 --port 8000
+uvicorn cps.interface.api:create_app --factory --host 0.0.0.0 --port 8000
 ```
 
 In production, run multiple uvicorn workers behind a reverse proxy:
 
 ```bash
-uvicorn cps.api:create_app --factory --host 0.0.0.0 --port 8000 --workers 4
+uvicorn cps.interface.api:create_app --factory --host 0.0.0.0 --port 8000 --workers 4
 ```
 
-Mount a shared volume at the `CPS_API_BASE_DIR` (default `./cps_data`) so
-replicas can read previously written artifacts. The app holds no in-process
-state.
+Mount a shared volume at the `CPS_API_BASE_DIR` (default `./cps_data`)
+so replicas can read previously written artifacts. The app holds no
+in-process state.
 
 ## Real-time Poller
 

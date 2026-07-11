@@ -97,7 +97,7 @@ The poller writes a long-form OHLCV CSV. Convert it to the wide price frame
 the pipeline expects with:
 
 ```python
-from cps.realtime import pivot_to_price_frame
+from cps.infrastructure.ingestors import pivot_to_price_frame
 prices = pivot_to_price_frame("prices.csv")
 ```
 
@@ -105,7 +105,7 @@ prices = pivot_to_price_frame("prices.csv")
 
 ```bash
 pip install -e ".[api]"
-uvicorn cps.api:create_app --factory --host 0.0.0.0 --port 8000
+uvicorn cps.interface.api:create_app --factory --host 0.0.0.0 --port 8000
 ```
 
 Submit a run:
@@ -114,7 +114,7 @@ Submit a run:
 curl -X POST http://localhost:8000/api/v1/runs \
   -H 'Content-Type: application/json' \
   -d '{
-        "config": {"forecast_method": "arima", "horizons_days": [1, 3, 7]},
+        "config": {"forecast_method": "arima", "horizons": [1, 3, 7]},
         "prices_csv_content": "date,btc,eth\n2024-01-01,42000,2200\n..."
       }'
 ```
@@ -146,10 +146,31 @@ crypto-portfolio \
 ### Python API
 
 ```python
-from cps import PipelineConfig, run_pipeline
+from cps import (
+    PipelineConfig,
+    ForecastService,
+    StructuredLogger,
+    MetricsRegistry,
+    ForecastGovernance,
+    FileArtifactStore,
+    run_pipeline,
+)
 
+store = FileArtifactStore("outputs")
+logger = StructuredLogger("crypto_portfolio", "outputs/events.jsonl")
+metrics = MetricsRegistry()
+governance = ForecastGovernance()
 config = PipelineConfig(forecast_method="arima", random_seed=42)
-artifacts = run_pipeline(prices, config)
+
+artifacts = run_pipeline(
+    prices,
+    config,
+    artifact_store=store,
+    logger=logger,
+    metrics_registry=metrics,
+    governance=governance,
+    forecast_service=ForecastService(),
+)
 ```
 
 ## Outputs
@@ -164,28 +185,29 @@ artifacts = run_pipeline(prices, config)
 
 ## Project Structure
 
+The package follows a layered architecture (see [docs/architecture.md](docs/architecture.md) for the full module map):
+
 ```
 optimising-cryptocurrency-portfolios/
-├── src/cps/           # Core package
-│   ├── cli.py         # CLI entrypoint (crypto-portfolio, cps-realtime)
-│   ├── pipeline.py    # Orchestration
-│   ├── data.py        # CSV price ingestion + cleaning
-│   ├── ingestors.py   # yfinance multi-asset ingestor
-│   ├── realtime.py    # ccxt real-time poller
-│   ├── forecast.py    # Return forecasting (naive, ARIMA, GARCH)
-│   ├── lstm_model.py  # Shared multi-asset LSTM forecaster
-│   ├── networking.py  # Correlation networks
-│   ├── portfolio.py   # Portfolio optimization
-│   ├── risk.py        # Risk constraints
-│   ├── execution.py   # Cost modeling
-│   ├── metrics.py     # Performance metrics
-│   ├── governance.py  # Forecast governance
-│   ├── observability.py # Logging and metrics
-│   ├── resilience.py  # Retry logic
-│   ├── runner.py      # Run management
-│   ├── api.py         # FastAPI stateless REST surface
-│   └── types.py       # Data types
-├── tests/             # Test suite
+├── src/cps/
+│   ├── config/        # PipelineConfig, ForecasterConfig, central settings
+│   ├── domain/        # Pure value objects, events, protocols, policies
+│   ├── application/   # PipelineService, PortfolioService, ForecastService, ...
+│   ├── infrastructure/
+│   │   ├── forecasters/   # naive, ARIMA, GARCH, LSTM
+│   │   ├── ingestors/     # synthetic, csv, yfinance, ccxt poller
+│   │   ├── observability/ # StructuredLogger, MetricsRegistry, Timer
+│   │   ├── resilience/    # RetryPolicy, require_optional
+│   │   └── stores/        # FileArtifactStore, LongFormCsvStore
+│   └── interface/
+│       ├── cli/           # crypto-portfolio, cps-realtime scripts
+│       └── api/           # create_app, FastAPI routes
+├── tests/             # Test suite (mirrors the layered layout)
+│   ├── application/
+│   ├── config/
+│   ├── domain/
+│   ├── infrastructure/
+│   └── interface/
 ├── docs/              # Documentation
 │   ├── architecture.md
 │   ├── api.md

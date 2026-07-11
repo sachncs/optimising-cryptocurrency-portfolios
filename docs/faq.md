@@ -41,7 +41,7 @@ cps-realtime --exchange binance --symbols BTC/USDT,ETH/USDT \
 You can then pivot the CSV into the wide price frame the pipeline expects:
 
 ```python
-from cps.realtime import pivot_to_price_frame
+from cps.infrastructure.ingestors import pivot_to_price_frame
 prices = pivot_to_price_frame("prices.csv")
 ```
 
@@ -80,10 +80,10 @@ Transaction costs and slippage are deducted from gross returns to produce net re
 
 ### Is the REST API stateful?
 
-No. `cps.api.create_app(base_dir)` builds a FastAPI app whose only state is
-the on-disk base directory. Each request carries its inputs inline and all
-artifacts are written to / read from that directory. You can run multiple
-replicas behind a shared network mount.
+No. `cps.interface.api.create_app(base_dir)` builds a FastAPI app whose
+only state is the on-disk base directory. Each request carries its
+inputs inline and all artifacts are written to / read from that
+directory. You can run multiple replicas behind a shared network mount.
 
 ## Troubleshooting
 

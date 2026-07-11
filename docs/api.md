@@ -1,57 +1,87 @@
 # API Reference
 
 ## Core Entry Points
-- `cps.pipeline.run_pipeline(prices, config)`
-- `cps.cli.main()`
-- `cps.cli.realtime_main(argv)`
-- `cps.api.create_app(base_dir)`
+- `cps.application.run_pipeline(prices, config, *, artifact_store, logger, metrics_registry, governance, forecast_service)`
+- `cps.interface.cli.main()`
+- `cps.interface.cli.realtime_main(argv)`
+- `cps.interface.api.create_app(base_dir)`
 
 ## Key Configuration
 `PipelineConfig` fields (with defaults shown):
-- `train_window_days` (180)
-- `correlation_window_days` (60)
-- `rebalance_step_days` (30)
-- `horizons_days` ([1, 3, 7, 14])
-- `consensus_runs` (20)
-- `majority_threshold` (0.5)
-- `risk_free_rate_annual` (0.045)
-- `forecast_method` (`arima`; one of `naive | arima | garch | lstm`)
-- `random_seed` (42)
-- `weight_cap` (0.35)
-- `max_assets` (25)
-- `min_assets` (2)
-- `max_volatility_annual` (1.2)
-- `transaction_cost_bps` (10.0)
-- `slippage_bps` (5.0)
-- `lstm_lookback` / `lstm_hidden_size` / `lstm_num_layers` / `lstm_max_epochs`
-- `garch_p` / `garch_o` / `garch_q` / `garch_mean` / `garch_dist` /
-  `garch_auto_order`
+
+| Field | Default | Notes |
+|-------|---------|-------|
+| `train_window_days` | `180` | Training-window length in calendar days. |
+| `correlation_window_days` | `60` | Rolling correlation window used inside consensus clustering. |
+| `rebalance_step_days` | `30` | Days between rebalances. |
+| `horizons` | `(Horizon(1), Horizon(3), Horizon(7), Horizon(14))` | Tuple of `Horizon` value objects. |
+| `consensus_runs` | `20` | Independent Louvain partitions per rebalance. |
+| `majority_threshold` | `0.5` | Co-membership cutoff for declaring two assets stable. |
+| `risk_free_rate_annual` | `0.045` | Annualised risk-free rate. |
+| `forecast_method` | `"arima"` | One of `naive`, `arima`, `garch`, `lstm`. |
+| `random_seed` | `42` | NumPy RNG seed for Louvain passes. |
+| `weight_cap` | `0.35` | Per-asset cap. |
+| `max_assets`, `min_assets` | `25`, `2` | Operational risk limits. |
+| `max_volatility_annual` | `1.2` | Annualised portfolio-volatility ceiling. |
+| `transaction_cost_bps`, `slippage_bps` | `10.0`, `5.0` | Execution cost bps. |
+| `forecaster` | `ForecasterConfig()` | Composite GARCH + LSTM overrides. |
+
+`PipelineConfig.with_overrides(seed=...)` accepts the `seed` /
+`rf_annual` aliases for the canonical `random_seed` /
+`risk_free_rate_annual` names.
 
 ## Output Artifacts
-`RunArtifacts` includes:
+`cps.domain.RunArtifacts` includes:
+
 - `returns`: cleaned log-returns time series.
 - `market_returns`: equal-weight market proxy series.
-- `trades`: per-rebalance trade records.
-- `summary`: per-strategy and per-horizon aggregated metrics.
-- `similarity_matrices`: consensus co-membership matrices by scenario.
+- `trades`: per-rebalance trade records (tuple of `PortfolioResult`).
+- `summary`: per-strategy and per-horizon aggregated metrics (tuple of
+  `EvaluationSummary`).
+- `similarity_matrices`: consensus co-membership matrices keyed by
+  `ScenarioKey`.
 
-## Ingestors
-- `cps.ingestors.YFinanceIngestorConfig`
-- `cps.ingestors.fetch_yfinance_prices(config)`
-- `cps.ingestors.fetch_yfinance_symbols(symbols, *, start, end, period,
-  interval, field, auto_adjust)`
-- Requires the `[ingestors]` extra (`yfinance`).
+## Application services (`cps.application`)
+- `PipelineService` / `PipelineResult` — orchestrator.
+- `PortfolioService` (and `PortfolioConstructionError`) — construction.
+- `ForecastService` — forecaster dispatch.
+- `RiskService` — operational limits facade.
+- `ArtifactService` — typed read-back of `ArtifactStore`.
+
+## Forecaster registry (`cps.infrastructure.forecasters`)
+- `default_registry()` returns a registry pre-populated with
+  `naive`, `arima`, `garch`, `lstm`.
+- Add a custom forecaster by implementing the `Forecaster` Protocol
+  from `cps.domain.protocols`.
+
+## Ingestors (`cps.infrastructure.ingestors`)
+- `SyntheticIngestor`, `CsvIngestor`.
+- `YFinanceIngestor` / `YFinanceConfig` / `YFinanceField` /
+  `YFinanceInterval` / `fetch_yfinance_prices` — behind the
+  `[ingestors]` extra.
+- `CCXTPoller` / `CCXTIngestorConfig` / `default_exchange_factory` /
+  `default_sleep` / `resolve_exchange_factory` / `pivot_to_price_frame`
+  — behind the `[realtime]` extra. Console script: `cps-realtime`.
 
 ## Real-time Poller
-- `cps.realtime.CCXTPollerConfig`
-- `cps.realtime.poll_once(config)`
-- `cps.realtime.run_polling_loop(config, max_iterations)`
-- `cps.realtime.pivot_to_price_frame(csv_path, *, date_col, value_col)`
-- Requires the `[realtime]` extra (`ccxt`).
-- New console script: `cps-realtime`.
+
+```python
+from cps.infrastructure.ingestors import CCXTPoller, CCXTIngestorConfig
+
+config = CCXTIngestorConfig(
+    exchange_id="binance",
+    symbols=("BTC/USDT", "ETH/USDT"),
+    output_csv="prices.csv",
+    timeframe="1m",
+    interval_seconds=60.0,
+    max_iterations=5,
+)
+CCXTPoller(config).run()
+```
 
 ## REST API
-`create_app(base_dir)` builds a FastAPI app:
+
+`cps.interface.api.create_app(base_dir)` builds a FastAPI app:
 
 | Method | Path | Purpose |
 |--------|------|---------|
@@ -63,5 +93,13 @@
 | `GET` | `/api/v1/runs/{run_id}/metrics` | Counters + timings. |
 | `GET` | `/api/v1/runs/{run_id}/log-returns?max_rows=` | Head of log-returns frame. |
 
-The service is stateless; all artifacts live under `base_dir`. Requires the
-`[api]` extra (`fastapi`, `uvicorn`).
+The service is stateless; all artifacts live under `base_dir`. Requires
+the `[api]` extra (`fastapi`, `uvicorn`).
+
+## Domain primitives (`cps.domain`)
+- `Weights` (+ `Weights.equal_weight`, `Weights.from_series`).
+- `Horizon` (+ `annual_to_daily_risk_free_rate`).
+- `GrossReturn`, `NetReturn` (the cost model).
+- `CovarianceMatrix` (+ `from_dataframe`).
+- `ScenarioKey`.
+- `PortfolioResult`, `EvaluationSummary`, `RunArtifacts`.
