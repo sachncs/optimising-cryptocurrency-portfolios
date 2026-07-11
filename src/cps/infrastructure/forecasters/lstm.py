@@ -14,7 +14,6 @@ import numpy as np
 import pandas as pd
 
 from ...config.pipeline_config import ForecasterConfig, LSTMTrainingConfig
-from ...domain.protocols import Forecaster
 from ...infrastructure.resilience import require_optional
 
 
@@ -60,7 +59,7 @@ class LstmForecaster:
         """Return the trainable parameters of the encoder and head."""
         return (*self.__lstm.parameters(), *self.__head.parameters())
 
-    def fit(self, returns: pd.DataFrame) -> "LstmForecaster":
+    def fit(self, returns: pd.DataFrame) -> LstmForecaster:
         """Fit the LSTM on a returns frame.
 
         Args:

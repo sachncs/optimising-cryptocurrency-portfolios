@@ -15,7 +15,6 @@ import pandas as pd
 from statsmodels.tsa.arima.model import ARIMA
 
 from ...config.pipeline_config import ForecasterConfig
-from ...domain.protocols import Forecaster
 from .naive import NaiveForecaster
 
 

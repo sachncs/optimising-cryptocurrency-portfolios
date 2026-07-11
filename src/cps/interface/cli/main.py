@@ -24,8 +24,6 @@ from pathlib import Path
 
 import pandas as pd
 
-from ...domain import EventPayload, PipelineEvent
-
 from ...application import (
     ForecastService,
     build_run_id,
@@ -40,6 +38,7 @@ from ...config.pipeline_config import (
     Horizon,
     LSTMTrainingConfig,
 )
+from ...domain import EventPayload, PipelineEvent
 from ...domain.policies import ForecastGovernance
 from ...infrastructure.ingestors import (
     CCXTIngestorConfig,
@@ -262,7 +261,7 @@ def _resolve_source(args: CLIArgs) -> str:
     return "synthetic"
 
 
-def _build_ingestor(args: CLIArgs) -> "YFinanceIngestor | CsvIngestor | SyntheticIngestor":
+def _build_ingestor(args: CLIArgs) -> YFinanceIngestor | CsvIngestor | SyntheticIngestor:
     """Construct the Ingestor Protocol implementation for the resolved source."""
     source = _resolve_source(args)
     if source == "yfinance":

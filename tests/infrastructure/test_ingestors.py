@@ -20,7 +20,6 @@ from cps.infrastructure.ingestors import (
     fetch_yfinance_prices,
     pivot_to_price_frame,
     resolve_exchange_factory,
-    resolve_sleep,
 )
 
 

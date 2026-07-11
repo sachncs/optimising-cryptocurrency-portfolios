@@ -41,8 +41,8 @@ class RiskLimits:
     def validate(
         self,
         selected: list[str],
-        weights: "Weights",
-        covariance: "CovarianceMatrix",
+        weights: Weights,
+        covariance: CovarianceMatrix,
     ) -> None:
         """Raise ``ValueError`` when ``(selected, weights, covariance)`` violates the limits."""
         n = len(selected)
@@ -83,11 +83,11 @@ def compute_effective_weight_cap(configured_cap: float, assets_count: int) -> fl
 
 
 def apply_weight_cap(
-    weights: "Weights",
+    weights: Weights,
     cap: float,
     *,
     max_iterations: int = 100,
-) -> "Weights":
+) -> Weights:
     """Enforce a per-asset cap on a long-only weight vector (water-filling).
 
     Args:
@@ -159,8 +159,8 @@ class ForecastGovernance:
 
 
 __all__ = [
-    "ForecastGovernance",
     "MIN_HISTORY_FOR_DRIFT",
+    "ForecastGovernance",
     "RiskLimits",
     "apply_weight_cap",
     "compute_effective_weight_cap",

@@ -22,13 +22,11 @@ import contextlib
 import json
 import logging
 import sys
-from collections.abc import Callable, Mapping
+from collections.abc import Callable
 from dataclasses import asdict
 from pathlib import Path
-from typing import Any
 
 from ...domain.events import EventPayload, PipelineEvent
-
 
 EventListener = Callable[[PipelineEvent, EventPayload], None]
 
@@ -94,7 +92,7 @@ class StructuredLogger:
         """Release the on-disk sink; listeners are not auto-removed."""
         return None
 
-    def __enter__(self) -> "StructuredLogger":
+    def __enter__(self) -> StructuredLogger:
         return self
 
     def __exit__(self, *_: object) -> None:

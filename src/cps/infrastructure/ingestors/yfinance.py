@@ -6,13 +6,11 @@ symbol, all values strictly positive.
 
 from __future__ import annotations
 
-from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import ClassVar, Literal
 
 import pandas as pd
 
-from ...domain.protocols import Ingestor
 from ...infrastructure.resilience import require_optional
 
 YFinanceInterval = Literal["1d", "1h", "1m", "5m", "15m", "30m", "60m", "1wk", "1mo"]

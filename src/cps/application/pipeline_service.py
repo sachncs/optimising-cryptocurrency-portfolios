@@ -21,16 +21,16 @@ import numpy as np
 import pandas as pd
 
 from ..config import (
-    PipelineConfig,
     SHARPE_DEFAULT_LEARNING_STEP,
     SHARPE_DEFAULT_MAX_ITERATIONS,
+    PipelineConfig,
     StrategySpec,
     default_strategy_specs,
 )
 from ..domain import (
     ArtifactStore,
-    EventPayload,
     EvaluationSummary,
+    EventPayload,
     ExecutionCostConfig,
     ForecastDriftPayload,
     ForecastGovernance,
@@ -62,7 +62,7 @@ from .data_cleaning import (
 )
 from .forecast_service import ForecastService
 from .portfolio_metrics import summarize_strategy
-from .portfolio_service import PortfolioService, PortfolioConstructionError
+from .portfolio_service import PortfolioConstructionError, PortfolioService
 from .risk_service import RiskService
 
 
@@ -419,7 +419,7 @@ def run_pipeline(
         The :class:`PipelineResult`.
     """
     from ..domain.policies import ForecastGovernance
-    from ..infrastructure.observability import MetricsRegistry, StructuredLogger
+    from ..infrastructure.observability import StructuredLogger
 
     if artifact_store is None or logger is None or metrics_registry is None:
         raise ValueError("artifact_store, logger, and metrics_registry are required")

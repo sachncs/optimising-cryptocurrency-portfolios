@@ -9,7 +9,6 @@ from cps.config import (
     GARCHForecastConfig,
     LSTMTrainingConfig,
     PipelineConfig,
-    StrategySpec,
     default_strategy_specs,
 )
 from cps.domain import Horizon

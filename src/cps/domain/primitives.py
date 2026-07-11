@@ -12,10 +12,9 @@ catch violations before the pipeline runs.
 
 from __future__ import annotations
 
-from collections.abc import Sequence
-from dataclasses import dataclass, field
+from collections.abc import Mapping, Sequence
+from dataclasses import dataclass
 from types import MappingProxyType
-from typing import Mapping
 
 import numpy as np
 import pandas as pd
@@ -79,7 +78,7 @@ class NetReturn:
             raise ValueError(f"net return {self.value} outside plausible range [-1, 10]")
 
     @classmethod
-    def from_gross_and_cost(cls, gross: GrossReturn, cost_rate: float) -> "NetReturn":
+    def from_gross_and_cost(cls, gross: GrossReturn, cost_rate: float) -> NetReturn:
         """Apply the multiplicative cost model ``(1 + g) * (1 - c) - 1``."""
         if not (0.0 <= cost_rate <= 1.0):
             raise ValueError(f"cost_rate must be in [0, 1], got {cost_rate}")
@@ -115,7 +114,7 @@ class Weights:
         object.__setattr__(self, "mapping", MappingProxyType(weights))
 
     @classmethod
-    def equal_weight(cls, assets: Sequence[str]) -> "Weights":
+    def equal_weight(cls, assets: Sequence[str]) -> Weights:
         """Build an equal-weighted portfolio for the given assets."""
         if not assets:
             raise ValueError("assets must be non-empty")
@@ -123,7 +122,7 @@ class Weights:
         return cls({asset: weight for asset in assets})
 
     @classmethod
-    def from_series(cls, series: pd.Series, tolerance: float = 1e-8) -> "Weights":
+    def from_series(cls, series: pd.Series, tolerance: float = 1e-8) -> Weights:
         """Build from a ``pd.Series`` indexed by asset."""
         if series.empty:
             raise ValueError("series must be non-empty")
@@ -204,7 +203,7 @@ class CovarianceMatrix:
     @classmethod
     def from_dataframe(
         cls, frame: pd.DataFrame, tolerance: float = 1e-6
-    ) -> "CovarianceMatrix":
+    ) -> CovarianceMatrix:
         """Build from a square ``pd.DataFrame`` indexed by asset."""
         if frame.empty or frame.shape[0] != frame.shape[1]:
             raise ValueError("covariance frame must be non-empty and square")

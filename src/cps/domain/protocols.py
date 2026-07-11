@@ -8,12 +8,11 @@ implementation can fulfil without inheriting from a shared base.
 
 from __future__ import annotations
 
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, ClassVar, Mapping, Protocol, runtime_checkable
+from typing import TYPE_CHECKING, Any, ClassVar, Protocol, runtime_checkable
 
-import numpy as np
 import pandas as pd
 
 if TYPE_CHECKING:
@@ -57,7 +56,7 @@ class Forecaster(Protocol):
         returns: pd.DataFrame,
         steps: int,
         *,
-        config: "ForecasterConfig | None" = None,
+        config: ForecasterConfig | None = None,
     ) -> pd.DataFrame:
         """Project ``steps`` forward for every column of ``returns``.
 
@@ -100,7 +99,7 @@ class ArtifactStore(Protocol):
     def write_run(
         self,
         run_id: str,
-        artifacts: "RunArtifacts",
+        artifacts: RunArtifacts,
         *,
         metrics: Mapping[str, object],
         events: Sequence[Mapping[str, object]],
@@ -165,8 +164,8 @@ class IngestorRequest:
 
     source: str
     csv_path: str | None = None
-    yfinance_config: "YFinanceIngestorConfig | None" = None
-    ccxt_config: "CCXTPollerConfig | None" = None
+    yfinance_config: YFinanceIngestorConfig | None = None
+    ccxt_config: CCXTPollerConfig | None = None
     synthetic_seed: int = 7
     synthetic_assets: int = 12
     synthetic_days: int = 500
@@ -184,11 +183,11 @@ class PipelineContext:
     """
 
     artifact_store: ArtifactStore
-    metrics_registry: "MetricsRegistry"
-    forecaster_registry: "ForecasterRegistry"
-    governance: "ForecastGovernance"
-    logger: "StructuredLogger"
-    event_listener: "EventListener | None" = None
+    metrics_registry: MetricsRegistry
+    forecaster_registry: ForecasterRegistry
+    governance: ForecastGovernance
+    logger: StructuredLogger
+    event_listener: EventListener | None = None
     extra: Mapping[str, object] = field(default_factory=dict)
 
 

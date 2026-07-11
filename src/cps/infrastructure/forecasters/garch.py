@@ -3,15 +3,13 @@
 from __future__ import annotations
 
 import warnings
-from typing import ClassVar
+from typing import Any, ClassVar
 
 import numpy as np
 import pandas as pd
-from typing import Any
 
 from ...config.pipeline_config import ForecasterConfig, GARCHForecastConfig
 from ...config.settings import GARCH_AUTO_ORDER_CANDIDATES
-from ...domain.protocols import Forecaster
 from ...infrastructure.resilience import require_optional
 
 
@@ -57,7 +55,6 @@ class GarchForecaster:
         self, series: pd.Series, steps: int, cfg: GARCHForecastConfig
     ) -> pd.Series:
         """Fit one GARCH model and return its mean path."""
-        from arch import arch_model  # local import keeps the module optional
 
         cleaned = series.dropna()
         if cleaned.empty or cleaned.nunique() < 2:

@@ -7,12 +7,12 @@ import pandas as pd
 import pytest
 
 from cps.domain import (
+    MIN_HISTORY_FOR_DRIFT,
     CovarianceMatrix,
     ForecastDriftPayload,
     ForecastGovernance,
     GrossReturn,
     Horizon,
-    MIN_HISTORY_FOR_DRIFT,
     NetReturn,
     PipelineEvent,
     PipelineStartedPayload,
@@ -23,7 +23,6 @@ from cps.domain import (
     apply_weight_cap,
     compute_effective_weight_cap,
 )
-
 
 # ----- Horizon -----
 

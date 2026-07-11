@@ -17,8 +17,6 @@ Annotations are *not* stringised: Pydantic models are defined inside
 :func:`create_app` so FastAPI can resolve their annotations eagerly.
 """
 
-import io
-import json
 from collections.abc import Sequence
 from dataclasses import asdict
 from pathlib import Path

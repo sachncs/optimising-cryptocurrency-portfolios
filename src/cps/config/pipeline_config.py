@@ -113,7 +113,7 @@ class PipelineConfig:
     max_volatility_annual: float = 1.2
     transaction_cost_bps: float = 10.0
     slippage_bps: float = 5.0
-    forecaster: "ForecasterConfig" = field(default_factory=lambda: ForecasterConfig())
+    forecaster: ForecasterConfig = field(default_factory=lambda: ForecasterConfig())
 
     def __post_init__(self) -> None:
         if not self.horizons:
@@ -126,7 +126,7 @@ class PipelineConfig:
             raise ValueError("weight_cap must be > 0")
 
     @classmethod
-    def with_overrides(cls, **aliases: int | float | str | tuple[object, ...] | bool | object) -> "PipelineConfig":
+    def with_overrides(cls, **aliases: int | float | str | tuple[object, ...] | bool | object) -> PipelineConfig:
         """Build a config accepting short aliases for the longer canonical names.
 
         Recognised aliases:

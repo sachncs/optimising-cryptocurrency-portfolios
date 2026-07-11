@@ -7,7 +7,6 @@ from typing import ClassVar
 import pandas as pd
 
 from ...application import load_price_data
-from ...domain.protocols import Ingestor
 
 
 class CsvIngestor:

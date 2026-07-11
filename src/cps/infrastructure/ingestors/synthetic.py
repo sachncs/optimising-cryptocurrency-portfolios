@@ -7,8 +7,6 @@ from typing import ClassVar
 import numpy as np
 import pandas as pd
 
-from ...domain.protocols import Ingestor
-
 
 class SyntheticIngestor:
     """Generates a 3-factor latent-model price frame for smoke tests / CI."""

@@ -7,7 +7,6 @@ from typing import ClassVar
 import pandas as pd
 
 from ...config.pipeline_config import ForecasterConfig
-from ...domain.protocols import Forecaster
 
 
 class NaiveForecaster:

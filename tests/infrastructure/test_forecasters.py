@@ -10,7 +10,6 @@ from cps.infrastructure.forecasters import (
     ArimaForecaster,
     ForecasterRegistry,
     GarchForecaster,
-    LstmForecaster,
     LstmForecasterFactory,
     NaiveForecaster,
     default_registry,

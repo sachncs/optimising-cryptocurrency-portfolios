@@ -3,14 +3,12 @@
 from __future__ import annotations
 
 import json
-from pathlib import Path
 
 import pytest
 
-from cps.domain import EventPayload, PipelineEvent, PipelineStartedPayload
+from cps.domain import PipelineEvent, PipelineStartedPayload
 from cps.infrastructure.observability import (
     MetricsRegistry,
-    MetricsSnapshot,
     StructuredLogger,
     Timer,
 )

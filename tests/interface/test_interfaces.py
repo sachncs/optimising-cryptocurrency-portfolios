@@ -2,20 +2,16 @@
 
 from __future__ import annotations
 
-import json
 import sys
 from pathlib import Path
 
 import pandas as pd
 import pytest
 
-from cps.interface import create_app
 from cps.interface.cli import (
     parse_arguments,
-    parse_realtime_arguments,
 )
 from cps.interface.cli.main import main, realtime_main
-
 
 # ---------- CLI ----------
 
