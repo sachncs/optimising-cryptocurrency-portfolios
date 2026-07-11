@@ -1,49 +1,222 @@
-"""Cryptocurrency portfolio optimisation through consensus clustering.
+"""Top-level public surface for the ``crypto-portfolio-system`` package.
 
-This package implements the consensus-clustered cryptocurrency portfolio
-construction framework described in `arXiv:2505.24831v2
-<https://arxiv.org/abs/2505.24831v2>`_. The end-to-end pipeline:
+Layered architecture:
 
-1. Ingests price data (CSV, yfinance, ccxt real-time, or synthetic).
-2. Forecasts returns (naive, ARIMA, GARCH, or a shared multi-asset LSTM).
-3. Builds rolling correlation networks from the returns window.
-4. Runs Louvain community detection multiple times and aggregates the
-   partitions into a consensus similarity matrix.
-5. Extracts stable clusters above a majority co-membership threshold.
-6. Optimises long-only portfolio weights per cluster draw using
-   Ledoit-Wolf-regularised covariance and Sharpe-ratio ascent.
-7. Validates risk limits, applies transaction costs, and writes
-   ``trades.csv``, ``summary.csv``, ``log_returns.csv``, ``events.jsonl``,
-   and ``metrics.json`` to disk.
-8. Tracks forecast drift via :class:`cps.governance.ForecastGovernance`.
+* :mod:`cps.domain` -- pure value objects, events, protocols, and
+  policies.
+* :mod:`cps.application` -- pipeline, forecast, portfolio, risk, and
+  artifact services.
+* :mod:`cps.infrastructure` -- logger, metrics, retry, stores, and
+  concrete forecaster / ingestor implementations.
+* :mod:`cps.interface` -- CLI entry points and FastAPI REST surface.
+* :mod:`cps.config` -- ``PipelineConfig`` and central settings.
 
-Public surface
---------------
-The package exposes two top-level symbols::
-
-    from cps import PipelineConfig, run_pipeline
-
-``PipelineConfig`` is the dataclass that controls every pipeline stage;
-``run_pipeline`` is the single entry point that takes a price frame and
-a config and returns a :class:`cps.types.RunArtifacts` container with
-all of the run's outputs.
-
-Optional extras
----------------
-Forecasting (``arch``, ``torch``), real-time ingestion (``ccxt``),
-yfinance pull (``yfinance``), and the REST API (``fastapi``,
-``uvicorn``) are gated behind optional extras so the default install
-stays small. See ``pyproject.toml`` for the full list.
-
-Examples:
-    >>> import pandas as pd
-    >>> from cps import PipelineConfig, run_pipeline
-    >>> prices = pd.read_csv("prices.csv", index_col="date", parse_dates=True)
-    >>> artifacts = run_pipeline(prices, PipelineConfig(forecast_method="naive"))
-    >>> artifacts.trades[0].net_return  # doctest: +SKIP
-    0.0123
+The top-level package re-exports the most commonly used public symbols
+so callers can write ``from cps import PipelineConfig, run_pipeline``
+without reaching into sub-packages.
 """
 
-from .pipeline import PipelineConfig, run_pipeline
+from __future__ import annotations
 
-__all__ = ["PipelineConfig", "run_pipeline"]
+from .application import (
+    ArtifactService,
+    ForecastService,
+    PipelineResult,
+    PipelineService,
+    PortfolioConstructionError,
+    PortfolioService,
+    RiskService,
+    run_pipeline,
+)
+from .config import (
+    ANNUAL_TRADING_DAYS,
+    BPS_DENOMINATOR,
+    CCXT_RATE_LIMIT_OPTION,
+    CCXT_SUPPORTED_TIMEFRAMES,
+    ForecasterConfig,
+    GARCH_AUTO_ORDER_CANDIDATES,
+    GARCH_DEFAULT_RESCALE,
+    GARCHDistribution,
+    GARCHForecastConfig,
+    GARCHMeanModel,
+    LEDOIT_WOLF_DENOMINATOR_FLOOR,
+    LEDOIT_WOLF_VARIANCE_FLOOR,
+    LSTMTrainingConfig,
+    PipelineConfig,
+    SHARPE_DEFAULT_LEARNING_STEP,
+    SHARPE_DEFAULT_MAX_ITERATIONS,
+    StrategySpec,
+    WEIGHT_CAP_DEFAULT_ITERATIONS,
+    default_strategy_specs,
+)
+from .domain import (
+    ArtifactStore,
+    CovarianceMatrix,
+    EventListener,
+    EventPayload,
+    ExchangeFactory,
+    Forecaster,
+    ForecasterConfig as ForecasterConfigProtocol,
+    ForecastDriftPayload,
+    ForecastGovernance,
+    GrossReturn,
+    Horizon,
+    Ingestor,
+    IngestorRequest,
+    MIN_HISTORY_FOR_DRIFT,
+    MetricsSnapshot,
+    NetReturn,
+    PipelineCompletedPayload,
+    PipelineContext,
+    PipelineEvent,
+    PipelineStartedPayload,
+    RebalanceExecutedPayload,
+    RiskLimits,
+    RunPaths,
+    ScenarioKey,
+    SleepCallable,
+    Weights,
+    apply_weight_cap,
+    compute_effective_weight_cap,
+)
+from .infrastructure import (
+    EventListener as InfrastructureEventListener,
+    FileArtifactStore,
+    LongFormCsvStore,
+    MetricsRegistry,
+    StructuredLogger,
+    Timer,
+)
+from .infrastructure.forecasters import (
+    ArimaForecaster,
+    ForecasterRegistry,
+    GarchForecaster,
+    LstmForecaster,
+    LstmForecasterFactory,
+    NaiveForecaster,
+    default_registry,
+)
+from .infrastructure.ingestors import (
+    CCXTIngestorConfig,
+    CCXTPoller,
+    CsvIngestor,
+    SyntheticIngestor,
+    YFinanceConfig,
+    YFinanceField,
+    YFinanceIngestor,
+    YFinanceInterval,
+    default_exchange_factory,
+    default_sleep,
+    fetch_yfinance_prices,
+    pivot_to_price_frame,
+)
+from .infrastructure.resilience import RetryPolicy, execute_with_retry, require_optional
+from .interface import create_app
+from .interface.cli import (
+    CLIArgs as InterfaceCLIArgs,
+    RealtimeCLIArgs,
+    parse_arguments,
+    parse_realtime_arguments,
+)
+from .interface.cli.main import main, realtime_main
+from .runner import build_run_id, ensure_idempotent_run, mark_run_complete
+from .types import EvaluationSummary, PortfolioResult, RunArtifacts
+
+__all__ = [
+    "ANNUAL_TRADING_DAYS",
+    "ArimaForecaster",
+    "ArtifactService",
+    "ArtifactStore",
+    "BPS_DENOMINATOR",
+    "CCXTIngestorConfig",
+    "CCXTPoller",
+    "CCXT_RATE_LIMIT_OPTION",
+    "CCXT_SUPPORTED_TIMEFRAMES",
+    "CovarianceMatrix",
+    "CsvIngestor",
+    "EvaluationSummary",
+    "EventListener",
+    "EventPayload",
+    "ExchangeFactory",
+    "FileArtifactStore",
+    "Forecaster",
+    "ForecasterConfig",
+    "ForecasterConfigProtocol",
+    "ForecasterRegistry",
+    "ForecastDriftPayload",
+    "ForecastGovernance",
+    "ForecastService",
+    "GARCH_AUTO_ORDER_CANDIDATES",
+    "GARCH_DEFAULT_RESCALE",
+    "GarchForecaster",
+    "GARCHDistribution",
+    "GARCHForecastConfig",
+    "GARCHMeanModel",
+    "GrossReturn",
+    "Horizon",
+    "Ingestor",
+    "IngestorRequest",
+    "InfrastructureEventListener",
+    "InterfaceCLIArgs",
+    "LEDOIT_WOLF_DENOMINATOR_FLOOR",
+    "LEDOIT_WOLF_VARIANCE_FLOOR",
+    "LSTMTrainingConfig",
+    "LongFormCsvStore",
+    "LstmForecaster",
+    "LstmForecasterFactory",
+    "MetricsRegistry",
+    "MetricsSnapshot",
+    "MIN_HISTORY_FOR_DRIFT",
+    "NaiveForecaster",
+    "NetReturn",
+    "PipelineCompletedPayload",
+    "PipelineConfig",
+    "PipelineContext",
+    "PipelineEvent",
+    "PipelineResult",
+    "PipelineService",
+    "PipelineStartedPayload",
+    "PortfolioConstructionError",
+    "PortfolioResult",
+    "PortfolioService",
+    "RebalanceExecutedPayload",
+    "RealtimeCLIArgs",
+    "RetryPolicy",
+    "RiskLimits",
+    "RiskService",
+    "RunArtifacts",
+    "RunPaths",
+    "ScenarioKey",
+    "SHARPE_DEFAULT_LEARNING_STEP",
+    "SHARPE_DEFAULT_MAX_ITERATIONS",
+    "SleepCallable",
+    "StrategySpec",
+    "StructuredLogger",
+    "SyntheticIngestor",
+    "Timer",
+    "WEIGHT_CAP_DEFAULT_ITERATIONS",
+    "Weights",
+    "YFinanceConfig",
+    "YFinanceField",
+    "YFinanceIngestor",
+    "YFinanceInterval",
+    "apply_weight_cap",
+    "build_run_id",
+    "compute_effective_weight_cap",
+    "create_app",
+    "default_exchange_factory",
+    "default_registry",
+    "default_sleep",
+    "default_strategy_specs",
+    "ensure_idempotent_run",
+    "execute_with_retry",
+    "fetch_yfinance_prices",
+    "main",
+    "mark_run_complete",
+    "parse_arguments",
+    "parse_realtime_arguments",
+    "pivot_to_price_frame",
+    "realtime_main",
+    "require_optional",
+    "run_pipeline",
+]
