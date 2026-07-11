@@ -62,7 +62,7 @@ class GarchForecaster:
         scaled = cleaned * cfg.rescale
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            best_result, best_order = self._select_best_fit(scaled, cfg)
+            best_result, _best_order = self._select_best_fit(scaled, cfg)
         forecast = best_result.forecast(horizon=steps)
         mean_forecast = np.asarray(forecast.mean).flatten()[-steps:]
         if mean_forecast.size != steps:

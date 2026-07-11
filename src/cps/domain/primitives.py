@@ -180,7 +180,6 @@ class CovarianceMatrix:
 
     def __post_init__(self) -> None:
         matrix = dict(self.matrix)
-        n = len(self.assets)
         for i, asset_a in enumerate(self.assets):
             for j, asset_b in enumerate(self.assets):
                 if (asset_a, asset_b) not in matrix:

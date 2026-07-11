@@ -150,7 +150,7 @@ class PipelineService:
         )
 
         for horizon in self.__config.horizons:
-            new_trades, new_summaries, new_similarities = self._run_horizon(
+            new_trades, new_summaries, _new_similarities = self._run_horizon(
                 returns=returns,
                 market_returns=market_returns,
                 horizon=horizon,
