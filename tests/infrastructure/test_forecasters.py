@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import numpy as np
 import pandas as pd
 import pytest
 
@@ -59,7 +60,7 @@ class TestGarchForecaster:
         assert GarchForecaster().name == "garch"
 
     def test_forecast_shape_with_arch_available(self):
-        arch = pytest.importorskip("arch")
+        pytest.importorskip("arch")
         rng = np.random.default_rng(0)
         rows = rng.normal(0, 0.01, size=200)
         frame = pd.DataFrame({"a": rows})
@@ -72,7 +73,7 @@ class TestGarchForecaster:
             GarchForecaster().forecast(pd.DataFrame({"a": [0.01] * 30}), 3)
 
     def test_uses_supplied_config(self):
-        arch = pytest.importorskip("arch")
+        pytest.importorskip("arch")
         rng = np.random.default_rng(0)
         rows = rng.normal(0, 0.01, size=120)
         frame = pd.DataFrame({"a": rows})
@@ -132,6 +133,3 @@ class TestForecasterRegistry:
         registry.register(StubForecaster())
         assert "stub" in registry.available()
         assert registry.resolve("stub") is not None
-
-
-import numpy as np

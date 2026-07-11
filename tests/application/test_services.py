@@ -109,7 +109,10 @@ class TestPipelineService:
         governance = ForecastGovernance()
         logger = StructuredLogger("pipeline_test")
         captured: list = []
-        listener = lambda event, payload: captured.append((event, payload))
+
+        def listener(event, payload):
+            captured.append((event, payload))
+
         context = PipelineContext(
             artifact_store=store,
             metrics_registry=metrics,

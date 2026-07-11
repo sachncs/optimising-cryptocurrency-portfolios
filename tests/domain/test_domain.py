@@ -148,9 +148,11 @@ class TestEvents:
         assert PipelineEvent.PIPELINE_COMPLETED.value == "pipeline_completed"
 
     def test_event_payloads_are_frozen(self):
+        import dataclasses
+
         payload = PipelineStartedPayload(rows=100, assets=4)
-        with pytest.raises(Exception):
-            payload.rows = 5  # type: ignore[misc]
+        with pytest.raises(dataclasses.FrozenInstanceError):
+            payload.rows = 5  # type: ignore[misc]  # mutate-on-frozen is the whole point
 
     def test_rebalance_payload_carries_expected_fields(self):
         payload = RebalanceExecutedPayload(

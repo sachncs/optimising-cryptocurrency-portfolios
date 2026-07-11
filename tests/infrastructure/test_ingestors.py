@@ -86,12 +86,12 @@ class TestYFinanceIngestor:
         assert frame.shape == (3, 1)
 
     def test_rejects_empty_symbols(self):
-        yfinance = pytest.importorskip("yfinance")
+        pytest.importorskip("yfinance")
         with pytest.raises(ValueError):
             YFinanceIngestor(YFinanceConfig(symbols=()))
 
     def test_rejects_missing_window(self):
-        yfinance = pytest.importorskip("yfinance")
+        pytest.importorskip("yfinance")
         with pytest.raises(ValueError):
             YFinanceIngestor(YFinanceConfig(symbols=("BTC-USD",)))
 
@@ -165,7 +165,9 @@ class TestCCXTPoller:
         assert factory is default_exchange_factory
 
     def test_resolve_exchange_factory_returns_passed(self):
-        sentinel = lambda exchange_id: None
+        def sentinel(exchange_id):
+            return None
+
         assert resolve_exchange_factory(sentinel) is sentinel
 
 

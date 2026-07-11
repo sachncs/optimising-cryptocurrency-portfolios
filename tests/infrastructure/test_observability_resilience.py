@@ -89,7 +89,7 @@ class TestStructuredLogger:
         target.handlers.clear()
         pre_existing = logging.NullHandler()
         target.addHandler(pre_existing)
-        logger = StructuredLogger("cps_test_compose")
+        _ = StructuredLogger("cps_test_compose")
         assert pre_existing in target.handlers
         # Our own handler was added on top.
         assert any(h is not pre_existing for h in target.handlers)
