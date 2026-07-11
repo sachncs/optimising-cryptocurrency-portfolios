@@ -25,7 +25,7 @@ portfolio optimization with covariance regularization, risk limits, and executio
 
 ## Features
 
-- **Return Forecasting** — Naive and ARIMA-based return prediction
+- **Return Forecasting** — Naive, ARIMA, GARCH (with AIC order selection), and a shared multi-asset LSTM
 - **Correlation Networks** — Rolling correlation matrices with Louvain community detection
 - **Consensus Clustering** — Stable cluster extraction across multiple runs
 - **Portfolio Optimization** — Sharpe-ratio maximization with covariance regularization
@@ -33,6 +33,8 @@ portfolio optimization with covariance regularization, risk limits, and executio
 - **Execution Modeling** — Transaction costs and slippage applied to net returns
 - **Production Controls** — Retry logic, idempotent runs, structured logging
 - **Governance** — Forecast drift detection and MSE tracking
+- **Data Sources** — Synthetic generator, CSV loader, yfinance multi-asset ingestor, and a ccxt real-time poller
+- **REST API** — Stateless FastAPI surface for running and reading artifacts via HTTP
 
 ## Installation
 
@@ -40,6 +42,18 @@ portfolio optimization with covariance regularization, risk limits, and executio
 git clone https://github.com/sachncs/optimising-cryptocurrency-portfolios.git
 cd optimising-cryptocurrency-portfolios
 pip install -e ".[dev]"
+```
+
+The forecasting, real-time, ingestor, and API features live behind optional
+extras to keep the default install small:
+
+```bash
+pip install -e ".[all]"                # everything
+pip install -e ".[forecast-garch]"     # arch-backed GARCH forecasting
+pip install -e ".[forecast-lstm]"      # torch-backed LSTM forecasting
+pip install -e ".[ingestors]"          # yfinance price ingestor
+pip install -e ".[realtime]"           # ccxt real-time poller
+pip install -e ".[api]"                # FastAPI REST interface
 ```
 
 ## Usage
@@ -55,6 +69,58 @@ crypto-portfolio --output-dir outputs --run-dir runs
 ```bash
 crypto-portfolio --prices-csv /path/to/prices.csv --date-col date --output-dir outputs --run-dir runs
 ```
+
+### yfinance Ingestor
+
+```bash
+pip install -e ".[ingestors]"
+crypto-portfolio \
+  --source yfinance \
+  --symbols BTC-USD,ETH-USD,SOL-USD \
+  --period 6mo \
+  --ingest-output-csv prices.csv \
+  --output-dir outputs --run-dir runs
+```
+
+### Real-time ccxt Poller
+
+```bash
+pip install -e ".[realtime]"
+cps-realtime \
+  --exchange binance \
+  --symbols BTC/USDT,ETH/USDT \
+  --output-csv prices.csv \
+  --timeframe 1m --interval-seconds 60 --max-iterations 5
+```
+
+The poller writes a long-form OHLCV CSV. Convert it to the wide price frame
+the pipeline expects with:
+
+```python
+from cps.realtime import pivot_to_price_frame
+prices = pivot_to_price_frame("prices.csv")
+```
+
+### REST API
+
+```bash
+pip install -e ".[api]"
+uvicorn cps.api:create_app --factory --host 0.0.0.0 --port 8000
+```
+
+Submit a run:
+
+```bash
+curl -X POST http://localhost:8000/api/v1/runs \
+  -H 'Content-Type: application/json' \
+  -d '{
+        "config": {"forecast_method": "arima", "horizons_days": [1, 3, 7]},
+        "prices_csv_content": "date,btc,eth\n2024-01-01,42000,2200\n..."
+      }'
+```
+
+Read artifacts back via `/api/v1/runs/{run_id}/summary`, `/trades`,
+`/metrics`, and `/log-returns`.
 
 ### All Options
 
@@ -101,10 +167,13 @@ artifacts = run_pipeline(prices, config)
 ```
 optimising-cryptocurrency-portfolios/
 ├── src/cps/           # Core package
-│   ├── cli.py         # CLI entrypoint
+│   ├── cli.py         # CLI entrypoint (crypto-portfolio, cps-realtime)
 │   ├── pipeline.py    # Orchestration
-│   ├── data.py        # Data ingestion
-│   ├── forecast.py    # Return forecasting
+│   ├── data.py        # CSV price ingestion + cleaning
+│   ├── ingestors.py   # yfinance multi-asset ingestor
+│   ├── realtime.py    # ccxt real-time poller
+│   ├── forecast.py    # Return forecasting (naive, ARIMA, GARCH)
+│   ├── lstm_model.py  # Shared multi-asset LSTM forecaster
 │   ├── networking.py  # Correlation networks
 │   ├── portfolio.py   # Portfolio optimization
 │   ├── risk.py        # Risk constraints
@@ -114,6 +183,7 @@ optimising-cryptocurrency-portfolios/
 │   ├── observability.py # Logging and metrics
 │   ├── resilience.py  # Retry logic
 │   ├── runner.py      # Run management
+│   ├── api.py         # FastAPI stateless REST surface
 │   └── types.py       # Data types
 ├── tests/             # Test suite
 ├── docs/              # Documentation
@@ -152,6 +222,11 @@ make help        # Show all commands
 - **pandas** — Data manipulation
 - **NetworkX** — Graph algorithms
 - **statsmodels** — Statistical models (ARIMA)
+- **arch** — GARCH volatility models (`[forecast-garch]`)
+- **PyTorch** — Multi-asset LSTM (`[forecast-lstm]`)
+- **yfinance** — Yahoo! Finance market data (`[ingestors]`)
+- **ccxt** — Real-time OHLCV polling (`[realtime]`)
+- **FastAPI / Uvicorn** — Stateless REST surface (`[api]`)
 - **pytest** — Testing framework
 - **ruff** — Linting and formatting
 - **mypy** — Static type checking
@@ -159,12 +234,13 @@ make help        # Show all commands
 
 ## Roadmap
 
-- [ ] Additional forecasting methods (GARCH, LSTM)
-- [ ] Real-time data ingestion
+- [x] Additional forecasting methods (GARCH, LSTM)
+- [x] Real-time data ingestion (ccxt polling)
+- [x] REST API interface (FastAPI, stateless)
+- [x] Multi-asset class support (yfinance ingestor)
+- [x] Docker containerization
 - [ ] Web dashboard
-- [ ] Docker containerization
-- [ ] REST API interface
-- [ ] Multi-asset class support
+- [ ] Streaming ingestion backplane (WebSocket / message broker)
 
 ## Contributing
 

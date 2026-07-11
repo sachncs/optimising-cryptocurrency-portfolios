@@ -80,6 +80,38 @@ docker run --rm --entrypoint crypto-portfolio crypto-portfolio-system:0.1.0 --he
   docker build --build-arg CPS_EXTRAS="forecast-lstm api" -t crypto-portfolio-system:all .
   ```
 
+## REST API
+
+The FastAPI surface (`cps.api`) is stateless. Run it with uvicorn:
+
+```bash
+pip install -e ".[api]"
+uvicorn cps.api:create_app --factory --host 0.0.0.0 --port 8000
+```
+
+In production, run multiple uvicorn workers behind a reverse proxy:
+
+```bash
+uvicorn cps.api:create_app --factory --host 0.0.0.0 --port 8000 --workers 4
+```
+
+Mount a shared volume at the `CPS_API_BASE_DIR` (default `./cps_data`) so
+replicas can read previously written artifacts. The app holds no in-process
+state.
+
+## Real-time Poller
+
+The `cps-realtime` console script runs a ccxt polling loop. Launch it as a
+sidecar / long-running service via cron, systemd, or your scheduler of
+choice:
+
+```bash
+pip install -e ".[realtime]"
+cps-realtime --exchange binance --symbols BTC/USDT,ETH/USDT \
+  --output-csv /data/rt_prices.csv --timeframe 1m --interval-seconds 60 \
+  --max-iterations 1440
+```
+
 ## Environment Considerations
 
 - Ensure sufficient memory for large correlation matrices
