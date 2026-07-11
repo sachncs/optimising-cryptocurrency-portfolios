@@ -44,7 +44,5 @@ GARCH_AUTO_ORDER_CANDIDATES: tuple[tuple[int, int, int], ...] = (
 CCXT_RATE_LIMIT_OPTION: bool = True
 """Whether ccxt exchanges are constructed with ``enableRateLimit=True``."""
 
-CCXT_SUPPORTED_TIMEFRAMES: frozenset[str] = frozenset(
-    {"1m", "5m", "15m", "30m", "1h", "2h", "4h", "1d", "1w", "1M"}
-)
+CCXT_SUPPORTED_TIMEFRAMES: frozenset[str] = frozenset({"1m", "5m", "15m", "30m", "1h", "2h", "4h", "1d", "1w", "1M"})
 """Timeframes accepted by the ccxt poller."""

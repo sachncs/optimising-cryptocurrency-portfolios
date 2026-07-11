@@ -72,9 +72,7 @@ class LstmForecaster:
         if returns.empty:
             raise ValueError("Cannot train LSTM on empty returns frame")
         if returns.shape[0] <= self.__config.lookback:
-            raise RuntimeError(
-                f"Need at least lookback+1 rows ({self.__config.lookback + 1}) to train LSTM"
-            )
+            raise RuntimeError(f"Need at least lookback+1 rows ({self.__config.lookback + 1}) to train LSTM")
 
         torch_gen = self.__torch.Generator().manual_seed(self.__config.seed)
         matrix = returns.to_numpy(dtype=float)

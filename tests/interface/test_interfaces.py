@@ -266,9 +266,7 @@ class TestRESTRunLifecycle:
         assert response.status_code == 400
 
     def test_prices_with_missing_date_column(self, client):
-        response = client.post(
-            "/api/v1/runs", json={"config": {}, "prices": [["x", "y"], [1, 2]]}
-        )
+        response = client.post("/api/v1/runs", json={"config": {}, "prices": [["x", "y"], [1, 2]]})
         assert response.status_code == 400
 
 
@@ -398,9 +396,7 @@ class TestPortfolioModule:
             index=pd.date_range("2024-01-01", periods=4, freq="D"),
         )
         covariance = compute_ledoit_wolf_constant_variance_covariance(returns)
-        weights = optimize_maximum_sharpe_ratio(
-            returns.mean(), covariance, 0.0, max_iterations=200
-        )
+        weights = optimize_maximum_sharpe_ratio(returns.mean(), covariance, 0.0, max_iterations=200)
         projected = project_weights_to_simplex(np.array([0.6, 0.7]))
         assert abs(weights.values.sum() - 1.0) < 1e-6
         assert projected.sum() == pytest.approx(1.0)

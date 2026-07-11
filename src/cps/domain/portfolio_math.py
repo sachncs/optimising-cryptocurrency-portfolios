@@ -38,11 +38,7 @@ def compute_ledoit_wolf_constant_variance_covariance(
     matrix = returns.to_numpy(dtype=float)
     observations_count, assets_count = matrix.shape
     if assets_count == 1:
-        variance = (
-            float(np.var(matrix[:, 0], ddof=1))
-            if observations_count > 1
-            else LEDOIT_WOLF_VARIANCE_FLOOR
-        )
+        variance = float(np.var(matrix[:, 0], ddof=1)) if observations_count > 1 else LEDOIT_WOLF_VARIANCE_FLOOR
         return pd.DataFrame(
             [[max(variance, LEDOIT_WOLF_VARIANCE_FLOOR)]],
             index=returns.columns,
@@ -82,16 +78,11 @@ def project_weights_to_simplex(weights: np.ndarray) -> np.ndarray:
     disturb the sum by ~1e-5 which is well within ``np.isclose``'s
     default tolerance but still off the simplex).
     """
-    if (
-        abs(float(weights.sum()) - 1.0) < 1e-12
-        and np.all(weights >= -1e-12)
-    ):
+    if abs(float(weights.sum()) - 1.0) < 1e-12 and np.all(weights >= -1e-12):
         return np.maximum(weights, 0.0)
     sorted_weights = np.sort(weights)[::-1]
     cumulative_sum = np.cumsum(sorted_weights)
-    rho = np.nonzero(
-        sorted_weights * np.arange(1, len(weights) + 1) > (cumulative_sum - 1)
-    )[0][-1]
+    rho = np.nonzero(sorted_weights * np.arange(1, len(weights) + 1) > (cumulative_sum - 1))[0][-1]
     theta = (cumulative_sum[rho] - 1) / (rho + 1)
     return np.asarray(np.maximum(weights - theta, 0.0))
 
@@ -117,9 +108,7 @@ def optimize_maximum_sharpe_ratio(
         portfolio_std = np.sqrt(max(portfolio_variance, LEDOIT_WOLF_DENOMINATOR_FLOOR))
         gradient = (
             mean_returns * portfolio_std
-            - (portfolio_return - daily_risk_free_rate)
-            * (covariance_matrix @ weights)
-            / portfolio_std
+            - (portfolio_return - daily_risk_free_rate) * (covariance_matrix @ weights) / portfolio_std
         ) / max(portfolio_variance, LEDOIT_WOLF_DENOMINATOR_FLOOR)
         weights = project_weights_to_simplex(weights + learning_step * gradient)
     return pd.Series(weights, index=expected_returns.index)

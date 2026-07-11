@@ -56,7 +56,6 @@ class StructuredLogger:
         self.__log_path = Path(log_path) if log_path else None
         self.__listeners: list[EventListener] = []
 
-
     @property
     def log_path(self) -> Path | None:
         """Return the configured on-disk JSONL sink (``None`` when absent)."""

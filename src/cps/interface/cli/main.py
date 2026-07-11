@@ -203,7 +203,9 @@ def _parse_horizons(text: str) -> tuple[int, ...]:
 
 
 def parse_arguments(
-    argv: Sequence[str] | None = None, *, available_forecast_methods: Sequence[str] = ("naive", "arima", "garch", "lstm")
+    argv: Sequence[str] | None = None,
+    *,
+    available_forecast_methods: Sequence[str] = ("naive", "arima", "garch", "lstm"),
 ) -> CLIArgs:
     """Parse the CLI args into a typed :class:`CLIArgs`."""
     parser = argparse.ArgumentParser(description="Consensus-clustered crypto portfolio system")

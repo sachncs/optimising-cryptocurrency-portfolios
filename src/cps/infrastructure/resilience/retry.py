@@ -49,9 +49,7 @@ class RetryPolicy:
             raise ValueError("backoff_multiplier must be >= 1")
 
 
-def execute_with_retry(
-    callable_fn: Callable[[], ReturnType], policy: RetryPolicy
-) -> ReturnType:
+def execute_with_retry(callable_fn: Callable[[], ReturnType], policy: RetryPolicy) -> ReturnType:
     """Invoke ``callable_fn`` with bounded-exponential-backoff retries.
 
     Args:

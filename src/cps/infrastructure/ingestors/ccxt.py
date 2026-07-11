@@ -74,9 +74,7 @@ class CCXTPoller:
         self.__exchange_factory = resolve_exchange_factory(config.exchange_factory)
         self.__sleep = resolve_sleep(config.sleep)
         self.__store = (
-            LongFormCsvStore(config.output_csv, date_col=config.date_col)
-            if config.output_csv is not None
-            else None
+            LongFormCsvStore(config.output_csv, date_col=config.date_col) if config.output_csv is not None else None
         )
 
     @property
@@ -92,18 +90,14 @@ class CCXTPoller:
             candles = self.__fetch_with_retry(exchange, symbol)
             if not candles:
                 continue
-            rows = pd.DataFrame(
-                candles, columns=["timestamp", "open", "high", "low", "close", "volume"]
-            )
+            rows = pd.DataFrame(candles, columns=["timestamp", "open", "high", "low", "close", "volume"])
             rows[self.__config.date_col] = pd.to_datetime(rows["timestamp"], unit="ms", utc=True)
             rows["symbol"] = symbol
             frames.append(rows)
         if not frames:
             return pd.DataFrame()
         combined = pd.concat(frames, ignore_index=True)
-        combined = combined[
-            [self.__config.date_col, "symbol", "open", "high", "low", "close", "volume"]
-        ]
+        combined = combined[[self.__config.date_col, "symbol", "open", "high", "low", "close", "volume"]]
         if self.__store is not None:
             return self.__store.append(combined)
         return combined

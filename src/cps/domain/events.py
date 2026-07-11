@@ -60,9 +60,4 @@ class PipelineCompletedPayload:
     duration_millis: float
 
 
-EventPayload = (
-    PipelineStartedPayload
-    | RebalanceExecutedPayload
-    | ForecastDriftPayload
-    | PipelineCompletedPayload
-)
+EventPayload = PipelineStartedPayload | RebalanceExecutedPayload | ForecastDriftPayload | PipelineCompletedPayload

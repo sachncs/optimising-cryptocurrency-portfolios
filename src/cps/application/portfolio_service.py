@@ -74,17 +74,11 @@ class PortfolioService:
                 satisfied.
         """
         if len(selected_assets) < self.__risk_limits.min_assets:
-            raise PortfolioConstructionError(
-                "Selected assets below minimum risk limit"
-            )
+            raise PortfolioConstructionError("Selected assets below minimum risk limit")
         if len(selected_assets) > self.__risk_limits.max_assets:
-            raise PortfolioConstructionError(
-                "Selected assets above maximum risk limit"
-            )
+            raise PortfolioConstructionError("Selected assets above maximum risk limit")
 
-        covariance = CovarianceMatrix.from_dataframe(
-            compute_ledoit_wolf_constant_variance_covariance(train_returns)
-        )
+        covariance = CovarianceMatrix.from_dataframe(compute_ledoit_wolf_constant_variance_covariance(train_returns))
         expected_returns = train_returns.mean(axis=0)
         raw_weights = optimize_maximum_sharpe_ratio(
             expected_returns,

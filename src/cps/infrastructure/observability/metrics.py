@@ -46,9 +46,7 @@ class MetricsRegistry:
         """Return an immutable :class:`MetricsSnapshot` of the current state."""
         return MetricsSnapshot(
             counters=dict(self.__counters),
-            timings_millis={
-                name: tuple(samples) for name, samples in self.__timings_millis.items()
-            },
+            timings_millis={name: tuple(samples) for name, samples in self.__timings_millis.items()},
         )
 
 

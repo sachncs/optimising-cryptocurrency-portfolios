@@ -113,9 +113,7 @@ def fetch_yfinance_prices(config: YFinanceConfig | None = None, /, **kwargs: obj
 
     field_frame = field_frame.dropna(how="all")
     if field_frame.empty:
-        raise ValueError(
-            f"yfinance returned only null '{config.field}' rows for symbols={list(config.symbols)}"
-        )
+        raise ValueError(f"yfinance returned only null '{config.field}' rows for symbols={list(config.symbols)}")
 
     missing = [symbol for symbol in config.symbols if symbol not in field_frame.columns]
     if missing:

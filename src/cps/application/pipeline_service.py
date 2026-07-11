@@ -120,9 +120,7 @@ class PipelineService:
             :class:`PipelineResult` with the in-memory trades and
             summaries plus the persisted :class:`RunArtifacts`.
         """
-        cleaned_prices = clean_price_data(
-            prices, DataValidationConfig(min_assets=self.__config.min_assets)
-        )
+        cleaned_prices = clean_price_data(prices, DataValidationConfig(min_assets=self.__config.min_assets))
         returns = log_returns(cleaned_prices)
         market_returns = market_proxy(returns)
 
@@ -181,9 +179,7 @@ class PipelineService:
                 duration_millis=self.__context.metrics_registry.snapshot().timings_millis.get(
                     "pipeline_duration_millis", ()
                 )[-1]
-                if self.__context.metrics_registry.snapshot().timings_millis.get(
-                    "pipeline_duration_millis", ()
-                )
+                if self.__context.metrics_registry.snapshot().timings_millis.get("pipeline_duration_millis", ())
                 else 0.0,
             ),
         )
@@ -200,20 +196,14 @@ class PipelineService:
         similarity_matrices: dict[str, np.ndarray],
     ) -> tuple[list[PortfolioResult], list[EvaluationSummary], dict[str, np.ndarray]]:
         """Run every strategy at every eligible rebalance for one horizon."""
-        horizon_trades_by_strategy: dict[str, list[float]] = {
-            spec.name: [] for spec in strategy_specs
-        }
-        horizon_market_by_strategy: dict[str, list[float]] = {
-            spec.name: [] for spec in strategy_specs
-        }
+        horizon_trades_by_strategy: dict[str, list[float]] = {spec.name: [] for spec in strategy_specs}
+        horizon_market_by_strategy: dict[str, list[float]] = {spec.name: [] for spec in strategy_specs}
         horizon_trades: list[PortfolioResult] = []
         horizon_summaries: list[EvaluationSummary] = []
 
         rebalance_index = self.__config.train_window_days
         while rebalance_index + horizon.days <= len(returns):
-            train_returns = returns.iloc[
-                rebalance_index - self.__config.train_window_days : rebalance_index
-            ]
+            train_returns = returns.iloc[rebalance_index - self.__config.train_window_days : rebalance_index]
             future_returns = returns.iloc[rebalance_index : rebalance_index + horizon.days]
             self._run_rebalance(
                 train_returns=train_returns,
@@ -356,16 +346,10 @@ class PipelineService:
             partitions.append(louvain_partition(graph, seed=seed))
         return consensus_similarity_matrix(partitions, assets)
 
-    def _select_assets(
-        self, clusters: list[list[str]], rebalance_index: int
-    ) -> list[str]:
+    def _select_assets(self, clusters: list[list[str]], rebalance_index: int) -> list[str]:
         """Draw one asset per cluster, deterministically seeded by ``rebalance_index``."""
         rng = np.random.default_rng(self.__config.random_seed + rebalance_index)
-        return [
-            cluster[int(rng.integers(0, len(cluster)))]
-            for cluster in clusters
-            if cluster
-        ]
+        return [cluster[int(rng.integers(0, len(cluster)))] for cluster in clusters if cluster]
 
     def _emit(self, event: PipelineEvent, payload: EventPayload) -> None:
         """Publish a typed event to the logger and any registered listener."""

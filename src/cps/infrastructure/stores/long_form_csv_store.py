@@ -69,9 +69,7 @@ class LongFormCsvStore:
             merged = pd.concat([existing, frame], ignore_index=True)
         else:
             merged = frame
-        merged = merged.drop_duplicates(
-            subset=[self.timestamp_col, self.symbol_col], keep="last"
-        )
+        merged = merged.drop_duplicates(subset=[self.timestamp_col, self.symbol_col], keep="last")
         merged = merged.sort_values([self.timestamp_col, self.symbol_col]).reset_index(drop=True)
         merged.to_csv(self.path, index=False)
         return merged

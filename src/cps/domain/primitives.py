@@ -193,16 +193,11 @@ class CovarianceMatrix:
                 if i < j:
                     other = matrix[(asset_b, asset_a)]
                     if abs(value - other) > self.tolerance * max(1.0, abs(value), abs(other)):
-                        raise ValueError(
-                            f"asymmetric covariance entry ({asset_a!r}, {asset_b!r}): "
-                            f"{value} != {other}"
-                        )
+                        raise ValueError(f"asymmetric covariance entry ({asset_a!r}, {asset_b!r}): {value} != {other}")
         object.__setattr__(self, "matrix", MappingProxyType(matrix))
 
     @classmethod
-    def from_dataframe(
-        cls, frame: pd.DataFrame, tolerance: float = 1e-6
-    ) -> CovarianceMatrix:
+    def from_dataframe(cls, frame: pd.DataFrame, tolerance: float = 1e-6) -> CovarianceMatrix:
         """Build from a square ``pd.DataFrame`` indexed by asset."""
         if frame.empty or frame.shape[0] != frame.shape[1]:
             raise ValueError("covariance frame must be non-empty and square")

@@ -51,9 +51,7 @@ def require_fastapi() -> None:
     require_optional("fastapi", "api")
 
 
-def _parse_inline_prices(
-    prices_payload: Sequence[Sequence[float | str]], date_col: str
-) -> pd.DataFrame:
+def _parse_inline_prices(prices_payload: Sequence[Sequence[float | str]], date_col: str) -> pd.DataFrame:
     """Parse an inline ``[[header...], [row...], ...]`` prices payload."""
     if not prices_payload:
         raise ValueError("'prices' payload is empty")
@@ -98,9 +96,7 @@ def _config_from_payload(payload: dict[str, Any]) -> PipelineConfig:
     return PipelineConfig(**filtered)
 
 
-def _capture_events(
-    logger: StructuredLogger, sink: list[dict[str, Any]]
-) -> EventListener:
+def _capture_events(logger: StructuredLogger, sink: list[dict[str, Any]]) -> EventListener:
     """Return an :class:`EventListener` that appends events to ``sink``."""
 
     def listener(event: PipelineEvent, payload: EventPayload) -> None:
@@ -264,9 +260,7 @@ def create_app(base_dir: str | Path = "./cps_data") -> Any:
         return {"run_id": run_id, "summary": artifact_service.read_summary(run_id)}
 
     @app.get("/api/v1/runs/{run_id}/trades")
-    def get_trades(
-        run_id: str, limit: int = Query(default=100, ge=1, le=10_000)
-    ) -> dict[str, Any]:
+    def get_trades(run_id: str, limit: int = Query(default=100, ge=1, le=10_000)) -> dict[str, Any]:
         """Return a (possibly truncated) list of trades for a run."""
         run_or_404(run_id)
         trades = artifact_service.read_trades(run_id)
@@ -279,9 +273,7 @@ def create_app(base_dir: str | Path = "./cps_data") -> Any:
         return {"run_id": run_id, "metrics": artifact_service.read_metrics(run_id)}
 
     @app.get("/api/v1/runs/{run_id}/log-returns")
-    def get_log_returns(
-        run_id: str, max_rows: int = Query(default=1000, ge=1, le=100_000)
-    ) -> dict[str, Any]:
+    def get_log_returns(run_id: str, max_rows: int = Query(default=1000, ge=1, le=100_000)) -> dict[str, Any]:
         """Return the leading rows of the cleaned log-returns frame."""
         run_or_404(run_id)
         frame = artifact_service.read_log_returns(run_id)

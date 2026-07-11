@@ -157,9 +157,7 @@ class TestPipelineService:
         # The default four strategies each emit at least one
         # REBALANCE_EXECUTED event (in the smoke test the synthetic
         # data is rich enough to clear the risk filter).
-        rebalance_events = [
-            payload for event, payload in captured if event == PipelineEvent.REBALANCE_EXECUTED
-        ]
+        rebalance_events = [payload for event, payload in captured if event == PipelineEvent.REBALANCE_EXECUTED]
         assert rebalance_events
         seen_strategies = {payload.strategy for payload in rebalance_events}
         assert seen_strategies.issubset({"baseline", "s", "p", "p-s"})

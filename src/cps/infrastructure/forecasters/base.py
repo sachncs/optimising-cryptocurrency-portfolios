@@ -34,9 +34,7 @@ class ForecasterRegistry:
             return self.__forecasters[name]
         except KeyError as exc:
             available = ", ".join(sorted(self.__forecasters.keys())) or "<none>"
-            raise KeyError(
-                f"Unknown forecast method {name!r}. Available: {available}."
-            ) from exc
+            raise KeyError(f"Unknown forecast method {name!r}. Available: {available}.") from exc
 
     def available(self) -> tuple[str, ...]:
         """Return the registered forecaster names in insertion order."""

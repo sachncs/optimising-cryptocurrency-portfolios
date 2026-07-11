@@ -176,9 +176,7 @@ class FileArtifactStore:
         similarity_dir = run_dir / "similarity"
         similarity_dir.mkdir(exist_ok=True)
         for key, matrix in matrices.items():
-            (similarity_dir / f"{key}.npy").write_bytes(
-                FileArtifactStore._numpy_save_bytes(matrix)
-            )
+            (similarity_dir / f"{key}.npy").write_bytes(FileArtifactStore._numpy_save_bytes(matrix))
         return similarity_dir
 
     @staticmethod

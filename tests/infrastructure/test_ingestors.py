@@ -76,9 +76,7 @@ class TestYFinanceIngestor:
 
         def fake_download(symbols, **kwargs):
             dates = pd.date_range("2024-01-01", periods=3, freq="D")
-            columns = pd.MultiIndex.from_product(
-                [["Close"], symbols], names=["field", "Ticker"]
-            )
+            columns = pd.MultiIndex.from_product([["Close"], symbols], names=["field", "Ticker"])
             return pd.DataFrame(np.ones((3, 1)), index=dates, columns=columns)
 
         with patch.object(yfinance, "download", side_effect=fake_download):
@@ -148,9 +146,7 @@ class TestCCXTPoller:
 
     def test_rejects_invalid_interval(self):
         with pytest.raises(ValueError):
-            CCXTIngestorConfig(
-                symbols=("BTC/USDT",), output_csv=None, interval_seconds=-1.0
-            )
+            CCXTIngestorConfig(symbols=("BTC/USDT",), output_csv=None, interval_seconds=-1.0)
 
     def test_rejects_empty_symbols(self):
         with pytest.raises(ValueError):
@@ -177,9 +173,7 @@ class TestPivotToPriceFrame:
         ts = 1_700_000_000_000
         pd.DataFrame(
             {
-                "date": pd.to_datetime(
-                    [ts, ts + 60_000, ts, ts + 60_000], unit="ms", utc=True
-                ),
+                "date": pd.to_datetime([ts, ts + 60_000, ts, ts + 60_000], unit="ms", utc=True),
                 "symbol": ["BTC/USDT", "BTC/USDT", "ETH/USDT", "ETH/USDT"],
                 "close": [100.0, 101.0, 50.0, 51.0],
             }

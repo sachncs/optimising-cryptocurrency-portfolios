@@ -51,9 +51,7 @@ class GarchForecaster:
             return forecaster_config.garch
         return self.__default_config
 
-    def _forecast_one(
-        self, series: pd.Series, steps: int, cfg: GARCHForecastConfig
-    ) -> pd.Series:
+    def _forecast_one(self, series: pd.Series, steps: int, cfg: GARCHForecastConfig) -> pd.Series:
         """Fit one GARCH model and return its mean path."""
 
         cleaned = series.dropna()
@@ -66,9 +64,7 @@ class GarchForecaster:
         forecast = best_result.forecast(horizon=steps)
         mean_forecast = np.asarray(forecast.mean).flatten()[-steps:]
         if mean_forecast.size != steps:
-            raise RuntimeError(
-                f"GARCH forecast returned {mean_forecast.size} steps but {steps} were requested"
-            )
+            raise RuntimeError(f"GARCH forecast returned {mean_forecast.size} steps but {steps} were requested")
         return pd.Series(mean_forecast / cfg.rescale, index=range(steps))
 
     @staticmethod
@@ -100,9 +96,7 @@ class GarchForecaster:
             if (p, o, q) == best_order:
                 continue
             try:
-                candidate_model = arch_model(
-                    scaled, mean=cfg.mean, vol="GARCH", p=p, o=o, q=q, dist=cfg.dist
-                )
+                candidate_model = arch_model(scaled, mean=cfg.mean, vol="GARCH", p=p, o=o, q=q, dist=cfg.dist)
                 candidate_result = candidate_model.fit(disp="off", show_warning=False)
             except Exception:
                 continue

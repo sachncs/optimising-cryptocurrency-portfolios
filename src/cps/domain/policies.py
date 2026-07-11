@@ -55,9 +55,7 @@ class RiskLimits:
             raise ValueError("Per-asset weight exceeds configured cap")
         cov_df = covariance.to_dataframe().reindex(index=selected, columns=selected)
         w = weights.to_series().reindex(selected)
-        annual_volatility = float(
-            (w.to_numpy() @ cov_df.to_numpy() @ w.to_numpy()) ** 0.5 * (365.0**0.5)
-        )
+        annual_volatility = float((w.to_numpy() @ cov_df.to_numpy() @ w.to_numpy()) ** 0.5 * (365.0**0.5))
         if annual_volatility > self.max_volatility_annual:
             raise ValueError("Portfolio annualized volatility exceeds configured maximum")
 

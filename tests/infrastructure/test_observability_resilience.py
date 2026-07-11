@@ -153,9 +153,7 @@ class TestExecuteWithRetry:
             sleep=recording_sleep,
         )
         with pytest.raises(ValueError):
-            execute_with_retry(
-                lambda: (_ for _ in ()).throw(ValueError("boom")), policy
-            )
+            execute_with_retry(lambda: (_ for _ in ()).throw(ValueError("boom")), policy)
         assert delays == [0.01, 0.02]
 
 
