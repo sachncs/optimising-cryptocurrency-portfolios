@@ -26,7 +26,14 @@ from typing import Any
 
 import pandas as pd
 
-from ...application import ArtifactService, ForecastService, run_pipeline
+from ...application import (
+    ArtifactService,
+    ForecastService,
+    build_run_id,
+    ensure_idempotent_run,
+    mark_run_complete,
+    run_pipeline,
+)
 from ...config import PipelineConfig
 from ...domain import (
     ArtifactStore,
@@ -37,7 +44,6 @@ from ...domain import (
 from ...domain.policies import ForecastGovernance
 from ...infrastructure.observability import MetricsRegistry, StructuredLogger
 from ...infrastructure.stores import FileArtifactStore
-from ...runner import build_run_id, ensure_idempotent_run, mark_run_complete
 
 
 def require_fastapi() -> None:
@@ -73,12 +79,12 @@ def _resolve_prices(payload: dict[str, Any], artifact_store: ArtifactStore, run_
     csv_content = payload.get("prices_csv_content")
     if csv_content:
         csv_path = artifact_store.write_upload(run_id, csv_content)
-        from ...data import load_price_data
+        from ...application import load_price_data
 
         return load_price_data(str(csv_path), date_col=payload.get("date_col", "date"))
     csv_path_value = payload.get("prices_csv_path")
     if csv_path_value:
-        from ...data import load_price_data
+        from ...application import load_price_data
 
         return load_price_data(csv_path_value, date_col=payload.get("date_col", "date"))
     raise ValueError("Request must include 'prices', 'prices_csv_content', or 'prices_csv_path'.")

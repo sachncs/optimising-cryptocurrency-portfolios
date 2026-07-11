@@ -16,7 +16,7 @@ from dataclasses import asdict
 import numpy as np
 import pandas as pd
 
-from .types import EvaluationSummary
+from ..domain.artifacts import EvaluationSummary
 
 
 def average_trade(trades: np.ndarray) -> float:

@@ -14,14 +14,18 @@ from __future__ import annotations
 import pandas as pd
 
 from ..config.settings import ANNUAL_TRADING_DAYS
-from ..domain.primitives import CovarianceMatrix, GrossReturn, NetReturn, Weights
-from ..domain.policies import RiskLimits, apply_weight_cap
-from ..domain.execution import ExecutionCostConfig, compute_total_cost_rate
-from ..portfolio import (
+from ..domain import (
+    CovarianceMatrix,
+    ExecutionCostConfig,
+    GrossReturn,
+    NetReturn,
+    Weights,
     compute_ledoit_wolf_constant_variance_covariance,
     compute_portfolio_simple_return,
+    compute_total_cost_rate,
     optimize_maximum_sharpe_ratio,
 )
+from ..domain.policies import RiskLimits, apply_weight_cap
 
 
 class PortfolioConstructionError(ValueError):

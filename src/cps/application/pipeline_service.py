@@ -27,13 +27,9 @@ from ..config import (
     StrategySpec,
     default_strategy_specs,
 )
-from ..data import (
-    DataValidationConfig,
-    clean_price_data,
-    log_returns,
-    market_proxy,
-)
 from ..domain import (
+    EvaluationSummary,
+    ExecutionCostConfig,
     ForecastDriftPayload,
     ForecastGovernance,
     Horizon,
@@ -41,22 +37,28 @@ from ..domain import (
     PipelineContext,
     PipelineEvent,
     PipelineStartedPayload,
+    PortfolioResult,
     RebalanceExecutedPayload,
+    RunArtifacts,
     ScenarioKey,
     Weights,
-)
-from ..domain.primitives import freeze_similarity_matrices, freeze_summary, freeze_trades
-from ..domain.execution import ExecutionCostConfig
-from ..metrics import summarize_strategy
-from ..networking import (
     build_weighted_graph_from_distance,
     consensus_similarity_matrix,
     correlation_distance_matrix,
+    freeze_similarity_matrices,
+    freeze_summary,
+    freeze_trades,
     louvain_partition,
     stable_clusters_from_similarity,
 )
-from ..types import EvaluationSummary, PortfolioResult, RunArtifacts
+from .data_cleaning import (
+    DataValidationConfig,
+    clean_price_data,
+    log_returns,
+    market_proxy,
+)
 from .forecast_service import ForecastService
+from .portfolio_metrics import summarize_strategy
 from .portfolio_service import PortfolioService, PortfolioConstructionError
 from .risk_service import RiskService
 

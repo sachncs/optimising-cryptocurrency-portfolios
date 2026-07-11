@@ -1,6 +1,8 @@
 """Portfolio construction: covariance regularisation, optimisation, returns.
 
 Pure numerical primitives used by :class:`cps.application.PortfolioService`.
+None of these functions perform I/O; they accept ``pandas`` objects
+and return ``pandas`` / ``numpy`` objects.
 """
 
 from __future__ import annotations
@@ -8,7 +10,7 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
-from .config.settings import (
+from ..config.settings import (
     LEDOIT_WOLF_DENOMINATOR_FLOOR,
     LEDOIT_WOLF_VARIANCE_FLOOR,
     SHARPE_DEFAULT_LEARNING_STEP,

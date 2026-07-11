@@ -8,8 +8,8 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
+from cps.domain import EvaluationSummary, PortfolioResult, RunArtifacts
 from cps.infrastructure.stores import FileArtifactStore
-from cps.types import EvaluationSummary, PortfolioResult, RunArtifacts
 
 
 def _sample_artifacts() -> RunArtifacts:

@@ -3,6 +3,9 @@
 Implements the network-analysis layer of the consensus-clustered
 portfolio framework described in `arXiv:2505.24831v2
 <https://arxiv.org/abs/2505.24831v2>`_.
+
+All functions in this module are pure: they accept and return
+``pandas``/``numpy``/``networkx`` data structures and perform no I/O.
 """
 
 from __future__ import annotations

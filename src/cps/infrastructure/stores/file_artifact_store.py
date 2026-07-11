@@ -11,9 +11,8 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from ...config.settings import GARCH_AUTO_ORDER_CANDIDATES  # noqa: F401  (re-exported)
+from ...domain import EvaluationSummary, PortfolioResult, RunArtifacts
 from ...domain.protocols import RunPaths
-from ...types import EvaluationSummary, PortfolioResult, RunArtifacts
 
 
 class FileArtifactStore:

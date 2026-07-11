@@ -1,9 +1,9 @@
 """Price ingestion, validation, cleaning, and return-series construction.
 
-Used by every ingestor that produces a long-form price frame
-(``cps.infrastructure.ingestors.csv_ingestor``,
-``...yfinance_ingestor``, ``...synthetic_ingestor``,
-``...ccxt_ingestor``).
+Application service used by every ingestor that produces a wide price
+frame. ``load_price_data`` performs the only I/O in this module;
+the other functions are pure and operate on in-memory ``pandas``
+frames.
 """
 
 from __future__ import annotations

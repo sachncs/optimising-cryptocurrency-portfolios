@@ -18,13 +18,21 @@ from __future__ import annotations
 
 import argparse
 import sys
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 
 import pandas as pd
 
-from ...application import ForecastService, PipelineService, run_pipeline
+from ...domain import EventPayload, PipelineEvent
+
+from ...application import (
+    ForecastService,
+    build_run_id,
+    ensure_idempotent_run,
+    mark_run_complete,
+    run_pipeline,
+)
 from ...config import PipelineConfig
 from ...config.pipeline_config import (
     ForecasterConfig,
@@ -40,12 +48,10 @@ from ...infrastructure.ingestors import (
     SyntheticIngestor,
     YFinanceConfig,
     YFinanceIngestor,
-    YFinanceInterval,
 )
 from ...infrastructure.observability import MetricsRegistry, StructuredLogger, Timer
 from ...infrastructure.resilience import RetryPolicy, execute_with_retry
 from ...infrastructure.stores import FileArtifactStore
-from ...runner import build_run_id, ensure_idempotent_run, mark_run_complete
 
 
 @dataclass(frozen=True)
@@ -323,7 +329,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     _persist_ingested_frame(prices, args.ingest_output_csv, args.date_col)
 
     captured_events: list = []
-    listener = _capture_events(captured_events)
+    capture_listener = _capture_events(captured_events)
+    logger.add_listener(capture_listener)
 
     timer = Timer()
     result = run_pipeline(
@@ -337,7 +344,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     )
     metrics_registry.record_timing_millis("pipeline_duration_millis", timer.elapsed_millis())
 
-    artifact_paths = artifact_store.write_run(
+    artifact_store.write_run(  # noqa: F841 (artifact_paths canonical layout; persisted by write_run)
         run_id,
         result.artifacts,
         metrics=asdict_payload(metrics_registry.snapshot()),
@@ -387,9 +394,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     return 0
 
 
-def _capture_events(sink: list) -> "Callable":
+def _capture_events(sink: list) -> Callable[[PipelineEvent, EventPayload], None]:
     """Build a listener that appends ``(event, payload)`` pairs to ``sink``."""
-    from ...domain import EventPayload, PipelineEvent
 
     def listener(event: PipelineEvent, payload: EventPayload) -> None:
         sink.append({"event": event.value, **payload.__dict__})

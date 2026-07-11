@@ -1,4 +1,10 @@
-"""Idempotent run markers and content-hash run identifiers."""
+"""Idempotent run markers and content-hash run identifiers.
+
+Application service used by both the CLI and the REST surface. The
+canonical ``run_id`` is a 16-hex-character SHA-256 prefix over the
+serialised ``PipelineConfig``; the marker file is the on-disk
+idempotency guard.
+"""
 
 from __future__ import annotations
 
@@ -7,7 +13,7 @@ import json
 from dataclasses import asdict
 from pathlib import Path
 
-from .config import PipelineConfig
+from ..config import PipelineConfig
 
 
 def build_run_id(config: PipelineConfig) -> str:

@@ -281,14 +281,14 @@ class TestRESTRunLifecycle:
 
 class TestDataModule:
     def test_load_price_data(self, prices_csv: Path):
-        from cps.data import load_price_data
+        from cps.application import load_price_data
 
         frame = load_price_data(str(prices_csv), date_col="date")
         assert list(frame.columns) == ["a", "b", "c"]
         assert frame.index.name == "date"
 
     def test_clean_price_data_rejects_non_positive(self):
-        from cps.data import DataValidationConfig, clean_price_data
+        from cps.application import DataValidationConfig, clean_price_data
 
         prices = pd.DataFrame(
             {
@@ -303,7 +303,7 @@ class TestDataModule:
             clean_price_data(prices, DataValidationConfig())
 
     def test_log_returns_and_market_proxy(self):
-        from cps.data import log_returns, market_proxy
+        from cps.application import log_returns, market_proxy
 
         prices = pd.DataFrame(
             {"a": [10.0, 11.0, 12.1, 13.31], "b": [20.0, 19.0, 20.9, 21.945]},
@@ -319,7 +319,12 @@ class TestMetricsModule:
     def test_metrics_zero_loss_and_empty_inputs(self):
         import numpy as np
 
-        from cps.metrics import average_trade, omega_ratio, profit_factor, win_rate
+        from cps.application import (
+            average_trade,
+            omega_ratio,
+            profit_factor,
+            win_rate,
+        )
 
         assert profit_factor(np.array([0.1, 0.2])) == float("inf")
         assert omega_ratio(np.array([0.1, 0.2]), threshold=0.0) == float("inf")
@@ -327,7 +332,7 @@ class TestMetricsModule:
         assert win_rate(np.array([])) == 0.0
 
     def test_summarize_strategy(self):
-        from cps.metrics import summarize_strategy
+        from cps.application import summarize_strategy
 
         summary = summarize_strategy("baseline", 1, [0.1, -0.1], [0.05, -0.05])
         assert summary.strategy == "baseline"
@@ -336,7 +341,7 @@ class TestMetricsModule:
 
 class TestNetworkingModule:
     def test_correlation_distance_diagonal_is_zero(self):
-        from cps.networking import correlation_distance_matrix
+        from cps.domain import correlation_distance_matrix
 
         returns = pd.DataFrame(
             {"a": [0.01, 0.02, 0.01, 0.0], "b": [0.01, 0.021, 0.009, -0.001]},
@@ -347,7 +352,7 @@ class TestNetworkingModule:
             assert distance.loc[column, column] == 0.0
 
     def test_consensus_similarity_default_identity(self):
-        from cps.networking import consensus_similarity_matrix
+        from cps.domain import consensus_similarity_matrix
 
         sim = consensus_similarity_matrix([], ["a", "b"])
         import numpy as np
@@ -357,8 +362,8 @@ class TestNetworkingModule:
 
 class TestRunnerModule:
     def test_run_id_is_deterministic(self):
+        from cps.application import build_run_id
         from cps.config import PipelineConfig
-        from cps.runner import build_run_id
 
         config = PipelineConfig()
         first = build_run_id(config)
@@ -366,15 +371,15 @@ class TestRunnerModule:
         assert first == second
 
     def test_run_id_changes_with_field(self):
+        from cps.application import build_run_id
         from cps.config import PipelineConfig
-        from cps.runner import build_run_id
 
         first = build_run_id(PipelineConfig.with_overrides(seed=1))
         second = build_run_id(PipelineConfig.with_overrides(seed=2))
         assert first != second
 
     def test_ensure_idempotent_run_rejects_completed(self, tmp_path):
-        from cps.runner import ensure_idempotent_run, mark_run_complete
+        from cps.application import ensure_idempotent_run, mark_run_complete
 
         marker = ensure_idempotent_run(str(tmp_path), "run_1")
         mark_run_complete(marker)
@@ -386,7 +391,7 @@ class TestPortfolioModule:
     def test_compute_ledoit_wolf_and_simplex(self):
         import numpy as np
 
-        from cps.portfolio import (
+        from cps.domain import (
             compute_ledoit_wolf_constant_variance_covariance,
             optimize_maximum_sharpe_ratio,
             project_weights_to_simplex,
@@ -405,7 +410,7 @@ class TestPortfolioModule:
         assert projected.sum() == pytest.approx(1.0)
 
     def test_compute_portfolio_simple_return(self):
-        from cps.portfolio import compute_portfolio_simple_return
+        from cps.domain import compute_portfolio_simple_return
 
         weights = pd.Series({"a": 0.5, "b": 0.5})
         future = pd.DataFrame(

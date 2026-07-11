@@ -1,7 +1,8 @@
-"""Shared value objects exchanged between pipeline modules.
+"""Pipeline result value objects.
 
-The dataclasses here are frozen and use only immutable container types
-(``tuple``, ``MappingProxyType``). Mutating any instance after
+Frozen dataclasses exchanged between the application services and the
+artifact store. The dataclasses use only immutable container types
+(``tuple``, ``MappingProxyType``) so mutating any instance after
 construction raises ``AttributeError``.
 
 The three dataclasses:
@@ -9,8 +10,8 @@ The three dataclasses:
 * :class:`PortfolioResult` -- a single per-rebalance trade record
   written to ``trades.json`` and surfaced through the REST API.
 * :class:`EvaluationSummary` -- a per (strategy, horizon) aggregate
-  produced by :func:`cps.application.portfolio_service` and serialised
-  to ``summary.json``.
+  produced by :func:`cps.application.portfolio_metrics.summarize_strategy`
+  and serialised to ``summary.json``.
 * :class:`RunArtifacts` -- the top-level return container of the
   application services. Bundles every output of one pipeline run.
 """

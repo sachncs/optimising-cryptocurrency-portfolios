@@ -6,12 +6,12 @@ from typing import ClassVar
 
 import pandas as pd
 
-from ...data import load_price_data
+from ...application import load_price_data
 from ...domain.protocols import Ingestor
 
 
 class CsvIngestor:
-    """Loads a CSV file via :func:`cps.data.load_price_data`."""
+    """Loads a CSV file via :func:`cps.application.load_price_data`."""
 
     name: ClassVar[str] = "csv"
 
