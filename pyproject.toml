@@ -40,6 +40,19 @@ dev = [
   "pre-commit>=3.7",
   "numpy<2.1",
 ]
+forecast-garch = ["arch>=6.2,<7"]
+forecast-lstm = ["torch>=2.0"]
+realtime = ["ccxt>=4.0"]
+api = ["fastapi>=0.110", "uvicorn>=0.27"]
+ingestors = ["yfinance>=0.2.30"]
+all = [
+  "arch>=6.2,<7",
+  "torch>=2.0",
+  "ccxt>=4.0",
+  "fastapi>=0.110",
+  "uvicorn>=0.27",
+  "yfinance>=0.2.30",
+]
 
 [project.urls]
 Homepage = "https://github.com/sachncs/optimising-cryptocurrency-portfolios"
@@ -49,6 +62,7 @@ Changelog = "https://github.com/sachncs/optimising-cryptocurrency-portfolios/blo
 
 [project.scripts]
 crypto-portfolio = "cps.cli:main"
+cps-realtime = "cps.cli:realtime_main"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
@@ -87,6 +101,11 @@ module = [
   "statsmodels.tsa.*",
   "statsmodels.tsa.arima.*",
   "statsmodels.tsa.arima.model.*",
+  "arch.*",
+  "torch.*",
+  "fastapi.*",
+  "ccxt.*",
+  "yfinance.*",
 ]
 ignore_missing_imports = true
 

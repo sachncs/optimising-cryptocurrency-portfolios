@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **Documentation pass**: every module in `src/cps/` now has a Google-style docstring (purpose, responsibilities, design rationale, references); every public class/function/method documents Args, Returns, Raises, and (where useful) Examples; inline comments explain non-obvious algorithmic operators (consensus co-occurrence accumulation, GARCH AIC grid, Ledoit-Wolf shrinkage, Held–Wolfe–Crowder simplex projection, Sharpe gradient, weight-cap water-filling, idempotent run IDs, structured-logger handler reset, ccxt polling rate limit). No behaviour or API changes.
+
+### Added
+- **GARCH forecasting** via the `arch` package. New `GARCHForecastConfig` exposes `mean`, `p`, `o`, `q`, `dist`, `rescale`, and `auto_order` (AIC grid search across `(1,0,1)`, `(1,1,1)`, `(2,1,1)`, `(1,1,2)`, `(2,0,1)`). Configurable from the CLI via `--forecast-method garch`, `--garch-p/o/q`, `--garch-mean`, `--garch-dist`, `--garch-auto-order`. Requires the `[forecast-garch]` extra.
+- **LSTM forecasting** via `torch` with a shared multi-asset LSTM. Existing module exposed at the CLI via `--forecast-method lstm` and configurable via `--lstm-lookback/hidden-size/num-layers/max-epochs`. Requires the `[forecast-lstm]` extra.
+- **yfinance multi-asset ingestor** in `cps.ingestors` (`YFinanceIngestorConfig`, `fetch_yfinance_prices`, `fetch_yfinance_symbols`). CLI flags `--source yfinance --symbols BTC-USD,ETH-USD [--start/--end/--period] [--interval] [--field] [--ingest-output-csv]` materialize a CSV that the rest of the pipeline consumes unchanged. Requires the `[ingestors]` extra.
+- **Stateless REST API** in `cps.api`. `create_app(base_dir)` builds a FastAPI app with `GET /api/v1/health`, `POST /api/v1/runs`, `GET /api/v1/runs/{run_id}`, `GET /api/v1/runs/{run_id}/summary`, `GET /api/v1/runs/{run_id}/trades?limit=`, `GET /api/v1/runs/{run_id}/metrics`, and `GET /api/v1/runs/{run_id}/log-returns?max_rows=`. All artifacts are written to the file system under `base_dir`. Requires the `[api]` extra.
+- **ccxt real-time ingestor** in `cps.realtime` (`CCXTPollerConfig`, `poll_once`, `run_polling_loop`, `pivot_to_price_frame`). New console script `cps-realtime` runs a bounded polling loop and appends OHLCV candles to a long-form CSV. Requires the `[realtime]` extra.
+- Optional dependencies grouped as extras: `forecast-garch`, `forecast-lstm`, `realtime`, `api`, `ingestors`, and `all`.
+- Tests covering GARCH config wiring, LSTM dispatch, yfinance ingestor (with mocks), the FastAPI surface, and the ccxt poller.
+
+### Changed
+- `PipelineConfig` and `forecast_matrix` now thread `GARCHForecastConfig` and `LSTMTrainingConfig` through so CLI overrides reach the forecaster.
+- `cps.cli` auto-detects the price source from `--symbols` / `--prices-csv` when `--source` is omitted, keeping existing CSV-driven flows working.
+- `mypy` now ignores missing imports for `arch`, `torch`, `fastapi`, `ccxt`, and `yfinance` (their stubs vary between versions).
+
 ## [0.1.0] - 2026-07-11
 
 ### Changed
