@@ -8,7 +8,49 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
-- **Documentation pass**: every module in `src/cps/` now has a Google-style docstring (purpose, responsibilities, design rationale, references); every public class/function/method documents Args, Returns, Raises, and (where useful) Examples; inline comments explain non-obvious algorithmic operators (consensus co-occurrence accumulation, GARCH AIC grid, Ledoit-Wolf shrinkage, Held–Wolfe–Crowder simplex projection, Sharpe gradient, weight-cap water-filling, idempotent run IDs, structured-logger handler reset, ccxt polling rate limit). No behaviour or API changes.
+- **Layered architecture landed**: `src/cps/` is now organized as
+  `config/`, `domain/`, `application/`, `infrastructure/`, and
+  `interface/`. Old flat modules are gone (`cli.py`, `pipeline.py`,
+  `data.py`, `ingestors.py`, `realtime.py`, `forecast.py`,
+  `lstm_model.py`, `networking.py`, `portfolio.py`, `risk.py`,
+  `execution.py`, `metrics.py`, `governance.py`, `observability.py`,
+  `resilience.py`, `runner.py`, `api.py`, `types.py`). Callers
+  migrate to the layered paths: `cps.application.run_pipeline`,
+  `cps.interface.cli.main`, `cps.interface.api.create_app`,
+  `cps.infrastructure.ingestors.{SyntheticIngestor,CsvIngestor,...}`,
+  `cps.infrastructure.forecasters.{NaiveForecaster,ArimaForecaster,...}`,
+  `cps.domain.{Weights,Horizon,GrossReturn,NetReturn,CovarianceMatrix,...}`.
+  No backward-compatibility shims.
+- **Strict type-check cleanliness**: `mypy src/cps` now reports zero
+  issues across 50 source files. Public exports tighten around the
+  `Forecaster`, `Ingestor`, `ArtifactStore`, `ExchangeFactory`, and
+  `SleepCallable` Protocols; the duplicate `ForecasterConfig` in
+  `cps.domain.protocols` is removed in favour of the canonical
+  `cps.config.pipeline_config.ForecasterConfig`.
+- **`PipelineService._run_horizon`** now correctly returns the
+  per-rebalance `PortfolioResult` records (previously the trades
+  bundle was always empty due to a missing collect-list wire).
+- **`project_weights_to_simplex`** declares "already on the simplex"
+  only within `1e-12` (the previous `np.isclose` default of `1e-5`
+  let 0.05-step gradient updates leak off the simplex).
+- **`StructuredLogger`** writes to `sys.stdout` and always attaches
+  its own `StreamHandler` so events are never silently dropped when
+  the host logger already has a (Null)Handler attached.
+- **`ForecastGovernance.is_drift_detected`** latches; once drift is
+  seen, it stays set for the lifetime of the instance. Subsequent
+  MSE observations no longer mask the original spike.
+- **`RetryPolicy`**, **`YFinanceConfig`**, **`CCXTIngestorConfig`**
+  raise `ValueError` at construction time on invalid inputs so
+  misconfigured pipelines never reach the executor.
+- **`PipelineConfig.with_overrides(seed=..., rf_annual=...)`**
+  accepts the short aliases for the canonical `random_seed` /
+  `risk_free_rate_annual` names.
+- **Console scripts** moved from `cps.cli` to `cps.interface.cli.main`
+  (the package's `__init__.py` no longer shadows the `main`
+  submodule name, so monkeypatching `cps.interface.cli.main.X` now
+  works for downstream tests).
+- **Tests**: `pytest -q` reports `137 passed` (was 27 failing on
+  master at the start of this work).
 
 ### Added
 - **GARCH forecasting** via the `arch` package. New `GARCHForecastConfig` exposes `mean`, `p`, `o`, `q`, `dist`, `rescale`, and `auto_order` (AIC grid search across `(1,0,1)`, `(1,1,1)`, `(2,1,1)`, `(1,1,2)`, `(2,0,1)`). Configurable from the CLI via `--forecast-method garch`, `--garch-p/o/q`, `--garch-mean`, `--garch-dist`, `--garch-auto-order`. Requires the `[forecast-garch]` extra.
