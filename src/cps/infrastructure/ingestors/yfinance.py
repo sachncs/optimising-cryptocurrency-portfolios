@@ -58,7 +58,7 @@ class YFinanceIngestor:
         return fetch_yfinance_prices(self.__config)
 
 
-def fetch_yfinance_prices(config: YFinanceConfig | None = None, /, **kwargs) -> pd.DataFrame:
+def fetch_yfinance_prices(config: YFinanceConfig | None = None, /, **kwargs: object) -> pd.DataFrame:
     """Fetch price history for one or more symbols from Yahoo! Finance.
 
     Args:
@@ -79,7 +79,7 @@ def fetch_yfinance_prices(config: YFinanceConfig | None = None, /, **kwargs) -> 
     if config is None:
         if "symbols" not in kwargs:
             raise ValueError("At least one symbol is required")
-        config = YFinanceConfig(**kwargs)
+        config = YFinanceConfig(**kwargs)  # type: ignore[arg-type]  # kwargs is filtered at call sites
 
     yf = require_optional("yfinance", "ingestors")
 

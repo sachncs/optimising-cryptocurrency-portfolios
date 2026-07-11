@@ -4,7 +4,8 @@ from __future__ import annotations
 
 import pandas as pd
 
-from ..domain.protocols import Forecaster, ForecasterConfig
+from ..config.pipeline_config import ForecasterConfig
+from ..domain.protocols import Forecaster
 from ..infrastructure.forecasters import ForecasterRegistry, default_registry
 
 

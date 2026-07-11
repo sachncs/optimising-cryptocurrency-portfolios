@@ -13,8 +13,8 @@ from typing import Any, ClassVar
 import numpy as np
 import pandas as pd
 
-from ...config.pipeline_config import LSTMTrainingConfig
-from ...domain.protocols import Forecaster, ForecasterConfig
+from ...config.pipeline_config import ForecasterConfig, LSTMTrainingConfig
+from ...domain.protocols import Forecaster
 from ...infrastructure.resilience import require_optional
 
 

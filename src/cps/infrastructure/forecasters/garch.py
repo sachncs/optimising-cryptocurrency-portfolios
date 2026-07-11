@@ -7,11 +7,12 @@ from typing import ClassVar
 
 import numpy as np
 import pandas as pd
+from typing import Any
 
-from ...config.pipeline_config import GARCHForecastConfig
-from ...domain.protocols import Forecaster, ForecasterConfig
-from ...infrastructure.resilience import require_optional
+from ...config.pipeline_config import ForecasterConfig, GARCHForecastConfig
 from ...config.settings import GARCH_AUTO_ORDER_CANDIDATES
+from ...domain.protocols import Forecaster
+from ...infrastructure.resilience import require_optional
 
 
 class GarchForecaster:
@@ -74,7 +75,7 @@ class GarchForecaster:
         return pd.Series(mean_forecast / cfg.rescale, index=range(steps))
 
     @staticmethod
-    def _select_best_fit(scaled: pd.Series, cfg: GARCHForecastConfig):
+    def _select_best_fit(scaled: pd.Series, cfg: GARCHForecastConfig) -> tuple[Any, tuple[int, int, int]]:
         """Fit the user-supplied order plus the auto-grid; pick the lowest AIC."""
         from arch import arch_model  # local import
 

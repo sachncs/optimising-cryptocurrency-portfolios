@@ -7,6 +7,7 @@ typed read methods for the REST API and the CLI ``summary`` command.
 from __future__ import annotations
 
 from collections.abc import Sequence
+from pathlib import Path
 from typing import Any
 
 import pandas as pd
@@ -45,7 +46,7 @@ class ArtifactService:
         text = self.__store.read_log_returns_text(run_id)
         return pd.read_csv(StringIO(text), index_col=0, parse_dates=True)
 
-    def run_dir(self, run_id: str):
+    def run_dir(self, run_id: str) -> Path:
         """Return the directory containing ``run_id``'s artifacts."""
         return self.__store.run_dir(run_id)
 

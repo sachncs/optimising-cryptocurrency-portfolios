@@ -126,7 +126,7 @@ class CCXTPoller:
         """Fetch candles for one symbol, applying the retry policy."""
         return list(
             execute_with_retry(
-                lambda sym=symbol: exchange.fetch_ohlcv(
+                lambda sym=symbol: exchange.fetch_ohlcv(  # type: ignore[misc]  # ccxt is optional
                     sym, timeframe=self.__config.timeframe, limit=self.__config.limit
                 ),
                 self.__config.retry,

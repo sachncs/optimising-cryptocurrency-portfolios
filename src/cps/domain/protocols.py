@@ -8,13 +8,24 @@ implementation can fulfil without inheriting from a shared base.
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, ClassVar, Mapping, Protocol, runtime_checkable
+from typing import TYPE_CHECKING, Any, ClassVar, Mapping, Protocol, runtime_checkable
 
 import numpy as np
 import pandas as pd
+
+if TYPE_CHECKING:
+    from ..config.pipeline_config import ForecasterConfig
+    from ..domain.policies import ForecastGovernance
+    from ..infrastructure.forecasters.base import ForecasterRegistry
+    from ..infrastructure.ingestors.ccxt import CCXTIngestorConfig as CCXTPollerConfig
+    from ..infrastructure.ingestors.yfinance import YFinanceConfig as YFinanceIngestorConfig
+    from ..infrastructure.observability.logger import StructuredLogger
+    from ..infrastructure.observability.metrics import MetricsRegistry
+    from .artifacts import RunArtifacts
+    from .events import EventPayload, PipelineEvent
 
 
 @dataclass(frozen=True)
@@ -62,18 +73,6 @@ class Forecaster(Protocol):
         ...
 
 
-@dataclass(frozen=True)
-class ForecasterConfig:
-    """Composite configuration for the forecaster registry.
-
-    Groups the per-algorithm overrides so ``PipelineConfig`` no longer
-    needs flat ``lstm_*`` / ``garch_*`` fields.
-    """
-
-    garch: "GARCHForecastConfig | None" = None
-    lstm: "LSTMTrainingConfig | None" = None
-
-
 @runtime_checkable
 class Ingestor(Protocol):
     """Fetches a wide price frame from an upstream source.
@@ -101,7 +100,7 @@ class ArtifactStore(Protocol):
     def write_run(
         self,
         run_id: str,
-        artifacts: "RunArtifacts",  # noqa: F821
+        artifacts: "RunArtifacts",
         *,
         metrics: Mapping[str, object],
         events: Sequence[Mapping[str, object]],
@@ -185,12 +184,33 @@ class PipelineContext:
     """
 
     artifact_store: ArtifactStore
-    metrics_registry: "MetricsRegistry"  # noqa: F821
-    forecaster_registry: "ForecasterRegistry"  # noqa: F821
-    governance: "ForecastGovernance"  # noqa: F821
-    logger: "StructuredLogger"  # noqa: F821
+    metrics_registry: "MetricsRegistry"
+    forecaster_registry: "ForecasterRegistry"
+    governance: "ForecastGovernance"
+    logger: "StructuredLogger"
     event_listener: "EventListener | None" = None
     extra: Mapping[str, object] = field(default_factory=dict)
 
 
-EventListener = "Callable[[PipelineEvent, EventPayload], None]"
+EventListener = Callable[["PipelineEvent", "EventPayload"], None]
+"""Listener callback signature; the payload is a typed Union so the alias
+must use forward references (resolved lazily under ``from __future__
+import annotations``)."""
+
+
+# Re-exports for type checkers only
+__all__ = [
+    "ArtifactStore",
+    "EventListener",
+    "ExchangeFactory",
+    "Forecaster",
+    "Ingestor",
+    "IngestorRequest",
+    "PipelineContext",
+    "RunPaths",
+    "SleepCallable",
+]
+
+
+if TYPE_CHECKING:  # pragma: no cover -- type-checker only
+    pass

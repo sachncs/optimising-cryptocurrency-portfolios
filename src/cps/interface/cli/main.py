@@ -262,7 +262,7 @@ def _resolve_source(args: CLIArgs) -> str:
     return "synthetic"
 
 
-def _build_ingestor(args: CLIArgs):
+def _build_ingestor(args: CLIArgs) -> "YFinanceIngestor | CsvIngestor | SyntheticIngestor":
     """Construct the Ingestor Protocol implementation for the resolved source."""
     source = _resolve_source(args)
     if source == "yfinance":
@@ -403,11 +403,11 @@ def _capture_events(sink: list) -> Callable[[PipelineEvent, EventPayload], None]
     return listener
 
 
-def asdict_payload(snapshot) -> dict:
+def asdict_payload(snapshot: "MetricsSnapshot") -> dict[str, object]:  # type: ignore[name-defined]  # MetricsSnapshot re-exported from cps.infrastructure.observability.metrics
     """Convert a :class:`MetricsSnapshot` to a JSON-ready dict."""
     from dataclasses import asdict
 
-    return asdict(snapshot)
+    return dict[str, object](asdict(snapshot))
 
 
 # ----------------------------------------------------------------------

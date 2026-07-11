@@ -12,6 +12,7 @@ catch violations before the pipeline runs.
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 from types import MappingProxyType
 from typing import Mapping

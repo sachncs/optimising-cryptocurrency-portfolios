@@ -28,6 +28,8 @@ from ..config import (
     default_strategy_specs,
 )
 from ..domain import (
+    ArtifactStore,
+    EventPayload,
     EvaluationSummary,
     ExecutionCostConfig,
     ForecastDriftPayload,
@@ -39,6 +41,7 @@ from ..domain import (
     PipelineStartedPayload,
     PortfolioResult,
     RebalanceExecutedPayload,
+    RiskLimits,
     RunArtifacts,
     ScenarioKey,
     Weights,
@@ -51,6 +54,7 @@ from ..domain import (
     louvain_partition,
     stable_clusters_from_similarity,
 )
+from ..infrastructure.observability import MetricsRegistry, StructuredLogger
 from .data_cleaning import (
     DataValidationConfig,
     clean_price_data,
@@ -204,6 +208,7 @@ class PipelineService:
         horizon_market_by_strategy: dict[str, list[float]] = {
             spec.name: [] for spec in strategy_specs
         }
+        horizon_trades: list[PortfolioResult] = []
         horizon_summaries: list[EvaluationSummary] = []
 
         rebalance_index = self.__config.train_window_days
@@ -216,6 +221,7 @@ class PipelineService:
                 train_returns=train_returns,
                 future_returns=future_returns,
                 market_returns=future_returns.mean(axis=1),
+                returns_index=returns.index,
                 rebalance_index=rebalance_index,
                 horizon=horizon,
                 strategy_specs=strategy_specs,
@@ -224,6 +230,7 @@ class PipelineService:
                 similarity_matrices=similarity_matrices,
                 horizon_trades_by_strategy=horizon_trades_by_strategy,
                 horizon_market_by_strategy=horizon_market_by_strategy,
+                horizon_trades=horizon_trades,
             )
             rebalance_index += self.__config.rebalance_step_days
 
@@ -236,13 +243,14 @@ class PipelineService:
                     market_returns=horizon_market_by_strategy[spec.name],
                 )
             )
-        return [], horizon_summaries, {}
+        return horizon_trades, horizon_summaries, similarity_matrices
 
     def _run_rebalance(
         self,
         train_returns: pd.DataFrame,
         future_returns: pd.DataFrame,
         market_returns: pd.Series,
+        returns_index: pd.DatetimeIndex,
         rebalance_index: int,
         horizon: Horizon,
         strategy_specs: Sequence[StrategySpec],
@@ -251,6 +259,7 @@ class PipelineService:
         similarity_matrices: dict[str, np.ndarray],
         horizon_trades_by_strategy: dict[str, list[float]],
         horizon_market_by_strategy: dict[str, list[float]],
+        horizon_trades: list[PortfolioResult],
     ) -> None:
         """Run every strategy for one rebalance and update bookkeeping."""
         for spec in strategy_specs:
@@ -280,7 +289,7 @@ class PipelineService:
                 )
 
             try:
-                _weights, _cov, gross, net = portfolio_service.build(
+                weights, _cov, gross, net = portfolio_service.build(
                     selected_assets=selected,
                     train_returns=selected_train,
                     future_returns=selected_future,
@@ -292,6 +301,20 @@ class PipelineService:
             horizon_trades_by_strategy[spec.name].append(net.value)
             horizon_market_by_strategy[spec.name].append(market_trade)
             self.__context.metrics_registry.increment("trades_executed")
+
+            trade = PortfolioResult(
+                strategy=spec.name,
+                horizon_days=horizon.days,
+                rebalance_date=returns_index[rebalance_index],
+                exit_date=returns_index[rebalance_index + horizon.days - 1],
+                selected_assets=tuple(selected),
+                weights=dict(weights.mapping),
+                turnover=weights.turnover,
+                gross_return=gross.value,
+                net_return=net.value,
+            )
+            horizon_trades.append(trade)
+
             self._emit(
                 PipelineEvent.REBALANCE_EXECUTED,
                 RebalanceExecutedPayload(
@@ -346,7 +369,7 @@ class PipelineService:
             if cluster
         ]
 
-    def _emit(self, event: PipelineEvent, payload) -> None:
+    def _emit(self, event: PipelineEvent, payload: EventPayload) -> None:
         """Publish a typed event to the logger and any registered listener."""
         self.__context.logger.publish(event, payload)
         listener = self.__context.event_listener
@@ -357,9 +380,7 @@ class PipelineService:
         """Compound the annual risk-free rate to a daily rate using the configured Horizon."""
         return self.__config.horizons[0].annual_to_daily_risk_free_rate(self.__config.risk_free_rate_annual)
 
-    def __derive_risk_limits(self, config: PipelineConfig) -> "RiskLimits":
-        from ..domain.policies import RiskLimits
-
+    def __derive_risk_limits(self, config: PipelineConfig) -> RiskLimits:
         return RiskLimits(
             max_assets=config.max_assets,
             min_assets=config.min_assets,
@@ -368,16 +389,16 @@ class PipelineService:
         )
 
 
-__all__ = ["PipelineResult", "PipelineService"]
+__all__ = ["PipelineResult", "PipelineService", "run_pipeline"]
 
 
 def run_pipeline(
     prices: pd.DataFrame,
     config: PipelineConfig,
-    artifact_store=None,
-    logger=None,
-    metrics_registry=None,
-    governance=None,
+    artifact_store: ArtifactStore | None = None,
+    logger: StructuredLogger | None = None,
+    metrics_registry: MetricsRegistry | None = None,
+    governance: ForecastGovernance | None = None,
     forecast_service: ForecastService | None = None,
 ) -> PipelineResult:
     """Convenience entry point that wires up the default registries.
@@ -400,14 +421,16 @@ def run_pipeline(
         The :class:`PipelineResult`.
     """
     from ..domain.policies import ForecastGovernance
-    from ..infrastructure.observability import MetricsRegistry, StructuredLogger, Timer
+    from ..infrastructure.observability import MetricsRegistry, StructuredLogger
 
     if artifact_store is None or logger is None or metrics_registry is None:
         raise ValueError("artifact_store, logger, and metrics_registry are required")
+    if forecast_service is None:
+        raise ValueError("forecast_service is required")
     context = PipelineContext(
         artifact_store=artifact_store,
         metrics_registry=metrics_registry,
-        forecaster_registry=(forecast_service.registry if forecast_service is not None else None),
+        forecaster_registry=forecast_service.registry,
         governance=governance or ForecastGovernance(),
         logger=logger or StructuredLogger("pipeline"),
     )

@@ -14,7 +14,8 @@ import numpy as np
 import pandas as pd
 from statsmodels.tsa.arima.model import ARIMA
 
-from ...domain.protocols import Forecaster, ForecasterConfig
+from ...config.pipeline_config import ForecasterConfig
+from ...domain.protocols import Forecaster
 from .naive import NaiveForecaster
 
 

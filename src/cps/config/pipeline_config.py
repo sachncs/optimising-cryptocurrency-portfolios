@@ -126,19 +126,24 @@ class PipelineConfig:
             raise ValueError("weight_cap must be > 0")
 
     @classmethod
-    def with_overrides(cls, **aliases: object) -> "PipelineConfig":
+    def with_overrides(cls, **aliases: int | float | str | tuple[object, ...] | bool | object) -> "PipelineConfig":
         """Build a config accepting short aliases for the longer canonical names.
 
         Recognised aliases:
             ``seed`` -> ``random_seed``
             ``rf_annual`` -> ``risk_free_rate_annual``
         """
-        renamed = dict(aliases)
+        from dataclasses import asdict, fields
+
+        renamed: dict[str, object] = dict(aliases)
         if "seed" in renamed and "random_seed" not in renamed:
             renamed["random_seed"] = renamed.pop("seed")
         if "rf_annual" in renamed and "risk_free_rate_annual" not in renamed:
             renamed["risk_free_rate_annual"] = renamed.pop("rf_annual")
-        return cls(**renamed)
+        valid_keys = {field.name for field in fields(cls)}
+        filtered = {key: value for key, value in renamed.items() if key in valid_keys}
+        del asdict  # silence unused-import warning
+        return cls(**filtered)  # type: ignore[arg-type]  # filtered by valid_keys
 
 
 @dataclass(frozen=True)

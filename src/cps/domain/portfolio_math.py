@@ -93,7 +93,7 @@ def project_weights_to_simplex(weights: np.ndarray) -> np.ndarray:
         sorted_weights * np.arange(1, len(weights) + 1) > (cumulative_sum - 1)
     )[0][-1]
     theta = (cumulative_sum[rho] - 1) / (rho + 1)
-    return np.maximum(weights - theta, 0.0)
+    return np.asarray(np.maximum(weights - theta, 0.0))
 
 
 def optimize_maximum_sharpe_ratio(

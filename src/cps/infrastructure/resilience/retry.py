@@ -37,7 +37,7 @@ class RetryPolicy:
     max_attempts: int = 3
     initial_backoff_seconds: float = 0.1
     backoff_multiplier: float = 2.0
-    sleep: SleepCallable = field(default=time.sleep)
+    sleep: SleepCallable = field(default=time.sleep)  # type: ignore[assignment]  # SleepCallable is a Protocol satisfying time.sleep's signature.
 
     def __post_init__(self) -> None:
         """Validate the policy at construction time."""
