@@ -40,13 +40,13 @@ dev = [
   "pre-commit>=3.7",
   "numpy<2.1",
 ]
-forecast-garch = ["arch>=6.2,<7"]
+forecast-garch = ["arch>=6.2,<9"]
 forecast-lstm = ["torch>=2.0"]
 realtime = ["ccxt>=4.0"]
 api = ["fastapi>=0.110", "uvicorn>=0.27"]
 ingestors = ["yfinance>=0.2.30"]
 all = [
-  "arch>=6.2,<7",
+  "arch>=6.2,<9",
   "torch>=2.0",
   "ccxt>=4.0",
   "fastapi>=0.110",
