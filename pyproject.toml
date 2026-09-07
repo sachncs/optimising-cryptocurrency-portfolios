@@ -1,0 +1,137 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "crypto-portfolio-system"
+version = "0.1.0"
+description = "Consensus-clustered cryptocurrency portfolio construction"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+authors = [
+  {name = "Sachin <sachncs@gmail.com>"}
+]
+keywords = ["cryptocurrency", "portfolio", "optimization", "consensus-clustering", "finance"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Financial and Insurance Industry",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Office/Business :: Financial :: Investment",
+]
+dependencies = [
+  "numpy>=1.24",
+  "pandas>=2.0",
+  "networkx>=3.1",
+  "statsmodels>=0.14"
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=7.4",
+  "pytest-cov>=4.1",
+  "mypy>=1.10",
+  "ruff>=0.5",
+  "pre-commit>=3.7",
+  "numpy<2.1",
+]
+forecast-garch = ["arch>=6.2,<7"]
+forecast-lstm = ["torch>=2.0"]
+realtime = ["ccxt>=4.0"]
+api = ["fastapi>=0.110", "uvicorn>=0.27"]
+ingestors = ["yfinance>=0.2.30"]
+all = [
+  "arch>=6.2,<7",
+  "torch>=2.0",
+  "ccxt>=4.0",
+  "fastapi>=0.110",
+  "uvicorn>=0.27",
+  "yfinance>=0.2.30",
+]
+
+[project.urls]
+Homepage = "https://github.com/sachncs/optimising-cryptocurrency-portfolios"
+Repository = "https://github.com/sachncs/optimising-cryptocurrency-portfolios"
+Issues = "https://github.com/sachncs/optimising-cryptocurrency-portfolios/issues"
+Changelog = "https://github.com/sachncs/optimising-cryptocurrency-portfolios/blob/main/CHANGELOG.md"
+
+[project.scripts]
+crypto-portfolio = "cps.interface.cli.main:main"
+cps-realtime = "cps.interface.cli.main:realtime_main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.coverage.run]
+branch = true
+source = ["cps"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+check_untyped_defs = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+show_error_codes = true
+
+[[tool.mypy.overrides]]
+module = [
+  "numpy.*",
+  "pandas.*",
+  "networkx.*",
+  "statsmodels.*",
+  "statsmodels.tsa.*",
+  "statsmodels.tsa.arima.*",
+  "statsmodels.tsa.arima.model.*",
+  "arch.*",
+  "torch.*",
+  "fastapi.*",
+  "ccxt.*",
+  "yfinance.*",
+]
+ignore_missing_imports = true
+
+[tool.ruff]
+target-version = "py310"
+line-length = 120
+
+[tool.ruff.lint]
+select = [
+  "E",   # pycodestyle errors
+  "W",   # pycodestyle warnings
+  "F",   # pyflakes
+  "I",   # isort
+  "B",   # flake8-bugbear
+  "UP",  # pyupgrade
+  "SIM", # flake8-simplify
+  "RUF", # ruff-specific rules
+]
+ignore = [
+  "E501",   # line too long (handled by formatter)
+  "B008",   # do not perform function calls in argument defaults
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["cps"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
