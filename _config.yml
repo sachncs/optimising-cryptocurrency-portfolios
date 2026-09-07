@@ -1,0 +1,8 @@
+title: "optimising-cryptocurrency-portfolios"
+description: "Optimising cryptocurrency portfolios through stable clustering of price correlation networks"
+theme: minima
+logo: /assets/logo.svg
+show_downloads: false
+permalink: /:title/
+plugins:
+  - jekyll-feed
