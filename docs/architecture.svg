@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 360" font-family="-apple-system, 'Segoe UI', sans-serif" font-size="14">
+  <defs>
+    <style>
+      .box { fill: #ffffff; stroke: #2f6feb; stroke-width: 1.5; }
+      .accent { fill: #f4f8ff; stroke: #2f6feb; stroke-width: 1.5; }
+      .text { fill: #0f1a30; }
+      .muted { fill: #5c6781; }
+      .arrow { stroke: #2f6feb; stroke-width: 1.5; fill: none; marker-end: url(#head); }
+    </style>
+    <marker id="head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2f6feb"/>
+    </marker>
+  </defs>
+  <rect width="800" height="360" fill="#fbfdff"/>
+  <text x="20" y="30" class="text" font-size="18" font-weight="bold">cps / consensus-clustered portfolio pipeline</text>
+  <text x="20" y="52" class="muted" font-size="12">End-to-end flow from price ingestion to net-return artefact.</text>
+
+  <g transform="translate(40,90)">
+    <rect width="160" height="50" rx="6" class="box"/>
+    <text x="80" y="30" text-anchor="middle" class="text">Ingest</text>
+    <text x="80" y="48" text-anchor="middle" class="muted" font-size="11">yfinance / ccxt / csv</text>
+  </g>
+  <path d="M 200,115 L 240,115" class="arrow"/>
+
+  <g transform="translate(240,90)">
+    <rect width="160" height="50" rx="6" class="box"/>
+    <text x="80" y="30" text-anchor="middle" class="text">Clean + log-returns</text>
+  </g>
+  <path d="M 400,115 L 440,115" class="arrow"/>
+
+  <g transform="translate(440,90)">
+    <rect width="160" height="50" rx="6" class="accent"/>
+    <text x="80" y="30" text-anchor="middle" class="text">Consensus Louvain</text>
+    <text x="80" y="48" text-anchor="middle" class="muted" font-size="11">stable clusters</text>
+  </g>
+
+  <g transform="translate(440,180)">
+    <rect width="160" height="50" rx="6" class="accent"/>
+    <text x="80" y="30" text-anchor="middle" class="text">Ledoit-Wolf shrinkage</text>
+  </g>
+  <path d="M 600,140 L 600,180" class="arrow"/>
+  <path d="M 200,115 Q 100,115 100,260 Q 100,270 240,270 L 240,270" class="arrow"/>
+
+  <g transform="translate(240,250)">
+    <rect width="160" height="50" rx="6" class="box"/>
+    <text x="80" y="30" text-anchor="middle" class="text">Sharpe ascent</text>
+  </g>
+  <path d="M 400,275 L 440,275" class="arrow"/>
+
+  <g transform="translate(440,250)">
+    <rect width="160" height="50" rx="6" class="box"/>
+    <text x="80" y="30" text-anchor="middle" class="text">Risk + cost</text>
+  </g>
+  <path d="M 600,275 L 640,275" class="arrow"/>
+
+  <g transform="translate(640,250)">
+    <rect width="120" height="50" rx="6" class="box"/>
+    <text x="60" y="30" text-anchor="middle" class="text">Artefacts</text>
+    <text x="60" y="48" text-anchor="middle" class="muted" font-size="11">events / trades</text>
+  </g>
+
+  <text x="40" y="345" class="muted" font-size="11">Diagram rendered from docs/architecture.svg.</text>
+</svg>

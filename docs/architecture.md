@@ -1,5 +1,38 @@
 # Architecture
 
+## Pipeline diagram
+
+![Pipeline diagram — full SVG with labelled stages](architecture.svg)
+
+ASCII fallback:
+
+```text
+     price frame
+         |
+         v
+  clean + log-returns
+         |
+         v
+  rolling correlation --->  consensus Louvain clustering
+         |                              |
+         v                              v
+  Ledoit-Wolf covariance        stable asset clusters
+         |                              |
+         +--------------v--------------+
+                        |
+                        v
+              Sharpe-ratio ascent
+                        |
+                        v
+          RiskLimits + ExecutionCostConfig
+                        |
+                        v
+      PortfolioResult -> FileArtifactStore
+                        |
+                        v
+      events.jsonl + metrics.json + trades.csv
+```
+
 ## Design Goals
 - Keep modules cohesive and single-purpose.
 - Preserve loose coupling via explicit typed interfaces.
