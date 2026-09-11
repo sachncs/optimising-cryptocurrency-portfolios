@@ -27,7 +27,7 @@ class YFinanceConfig:
     period: str | None = None
     interval: YFinanceInterval = "1d"
     field: YFinanceField = "Close"
-    auto_adjust: bool = False
+    auto_adjust: bool = True
 
     def __post_init__(self) -> None:
         """Validate that the config has the inputs needed to fetch anything."""
