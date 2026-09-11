@@ -1,7 +1,6 @@
-title: "optimising-cryptocurrency-portfolios"
-description: "Optimising cryptocurrency portfolios through stable clustering of price correlation networks"
+title: "Crypto Portfolio System"
+description: "Consensus-clustered cryptocurrency portfolio construction, backtesting, and serving."
 theme: minima
-logo: /assets/logo.svg
 show_downloads: false
 permalink: /:title/
 plugins:

@@ -70,7 +70,7 @@ all = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/sachncs/optimising-cryptocurrency-portfolios"
+Homepage = "https://sachncs.github.io/optimising-cryptocurrency-portfolios/"
 Repository = "https://github.com/sachncs/optimising-cryptocurrency-portfolios"
 Issues = "https://github.com/sachncs/optimising-cryptocurrency-portfolios/issues"
 Changelog = "https://github.com/sachncs/optimising-cryptocurrency-portfolios/blob/master/CHANGELOG.md"
