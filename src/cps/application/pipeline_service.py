@@ -53,7 +53,7 @@ from ..domain import (
     louvain_partition,
     stable_clusters_from_similarity,
 )
-from ..infrastructure.observability import MetricsRegistry, StructuredLogger
+from ..infrastructure.observability import MetricsRegistry, StructuredLogger, Timer
 from .data_cleaning import (
     DataValidationConfig,
     clean_price_data,
@@ -120,6 +120,7 @@ class PipelineService:
             :class:`PipelineResult` with the in-memory trades and
             summaries plus the persisted :class:`RunArtifacts`.
         """
+        timer = Timer()
         cleaned_prices = clean_price_data(prices, DataValidationConfig(min_assets=self.__config.min_assets))
         returns = log_returns(cleaned_prices)
         market_returns = market_proxy(returns)
@@ -167,20 +168,17 @@ class PipelineService:
             summary=freeze_summary(all_summaries),
             similarity_matrices=freeze_similarity_matrices(similarity_matrices),
         )
+        duration_millis = timer.elapsed_millis()
         self.__context.metrics_registry.record_timing_millis(
             "pipeline_duration_millis",
-            float("nan"),
+            duration_millis,
         )
         self._emit(
             PipelineEvent.PIPELINE_COMPLETED,
             PipelineCompletedPayload(
                 trades=len(all_trades),
                 summaries=len(all_summaries),
-                duration_millis=self.__context.metrics_registry.snapshot().timings_millis.get(
-                    "pipeline_duration_millis", ()
-                )[-1]
-                if self.__context.metrics_registry.snapshot().timings_millis.get("pipeline_duration_millis", ())
-                else 0.0,
+                duration_millis=duration_millis,
             ),
         )
         return PipelineResult(artifacts=artifacts, trades=all_trades, summaries=all_summaries)
