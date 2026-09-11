@@ -1,7 +1,7 @@
 # API Reference
 
 ## Core Entry Points
-- `cps.application.run_pipeline(prices, config, *, artifact_store, logger, metrics_registry, governance, forecast_service)`
+- `cps.application.run_pipeline(prices, config, artifact_store=None, logger=None, metrics_registry=None, governance=None, forecast_service=None)`
 - `cps.interface.cli.main()`
 - `cps.interface.cli.realtime_main(argv)`
 - `cps.interface.api.create_app(base_dir)`
