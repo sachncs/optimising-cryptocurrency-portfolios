@@ -403,7 +403,6 @@ def run_pipeline(
         The :class:`PipelineResult`.
     """
     from ..domain.policies import ForecastGovernance
-    from ..infrastructure.observability import StructuredLogger
 
     if artifact_store is None or logger is None or metrics_registry is None:
         raise ValueError("artifact_store, logger, and metrics_registry are required")
@@ -413,12 +412,12 @@ def run_pipeline(
         artifact_store=artifact_store,
         metrics_registry=metrics_registry,
         forecaster_registry=forecast_service.registry,
-        governance=governance or ForecastGovernance(),
-        logger=logger or StructuredLogger("pipeline"),
+        governance=governance if governance is not None else ForecastGovernance(),
+        logger=logger,
     )
     service = PipelineService(
         config=config,
         context=context,
-        forecast_service=forecast_service or ForecastService(),
+        forecast_service=forecast_service,
     )
     return service.run(prices)
