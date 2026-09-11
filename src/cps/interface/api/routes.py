@@ -106,6 +106,32 @@ def _capture_events(logger: StructuredLogger, sink: list[dict[str, Any]]) -> Eve
     return listener
 
 
+def _package_version() -> str:
+    """Resolve the package version from installed metadata, with pyproject fallback."""
+    try:
+        from importlib.metadata import PackageNotFoundError, version
+
+        try:
+            return version("crypto-portfolio-system")
+        except PackageNotFoundError:
+            pass
+    except ImportError:
+        pass
+    try:
+        import tomllib
+    except ImportError:
+        import tomli as tomllib  # type: ignore[no-redef]
+    from pathlib import Path
+
+    pyproject_path = Path(__file__).resolve().parents[4] / "pyproject.toml"
+    try:
+        with pyproject_path.open("rb") as fh:
+            data = tomllib.load(fh)
+    except (FileNotFoundError, OSError):
+        return "0.0.0"
+    return str(data.get("project", {}).get("version", "0.0.0"))
+
+
 def create_app(base_dir: str | Path = "./cps_data") -> Any:
     """Build a FastAPI app bound to ``base_dir`` for artifact storage.
 
@@ -150,7 +176,7 @@ def create_app(base_dir: str | Path = "./cps_data") -> Any:
 
     app = FastAPI(
         title="Crypto Portfolio System API",
-        version="0.2.0",
+        version=_package_version(),
         description="Stateless REST interface for running and reading consensus-clustered crypto portfolios.",
     )
 
