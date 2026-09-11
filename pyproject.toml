@@ -58,7 +58,7 @@ all = [
 Homepage = "https://github.com/sachncs/optimising-cryptocurrency-portfolios"
 Repository = "https://github.com/sachncs/optimising-cryptocurrency-portfolios"
 Issues = "https://github.com/sachncs/optimising-cryptocurrency-portfolios/issues"
-Changelog = "https://github.com/sachncs/optimising-cryptocurrency-portfolios/blob/main/CHANGELOG.md"
+Changelog = "https://github.com/sachncs/optimising-cryptocurrency-portfolios/blob/master/CHANGELOG.md"
 
 [project.scripts]
 crypto-portfolio = "cps.interface.cli.main:main"
