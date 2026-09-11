@@ -63,4 +63,6 @@ plug in behind Protocols and never reach across layers. See
 
 ## CI Quality Gate
 - GitHub Actions workflow runs tests on Python 3.10, 3.11, and 3.12.
-- `ruff check` and `mypy --strict` are part of the make check target.
+- `ruff check` and `mypy src/cps` (with the strictness flags enabled in
+  `pyproject.toml`'s `[tool.mypy]` section) are part of the
+  `make check` target.
