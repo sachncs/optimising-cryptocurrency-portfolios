@@ -18,6 +18,8 @@ It ingests price data, forecasts returns, builds rolling correlation networks, e
 stable asset clusters via consensus Louvain community detection, then performs Sharpe-ratio
 portfolio optimization with covariance regularization, risk limits, and execution costs.
 
+![Pipeline diagram](docs/architecture.svg)
+
 ---
 
 ## Features
