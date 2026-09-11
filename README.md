@@ -72,6 +72,13 @@ pip install -e ".[api]"                # FastAPI REST interface
 ```bash
 # 1. Synthetic data
 crypto-portfolio --output-dir outputs --run-dir runs
+# Expected terminal output (run-id hash will differ):
+#   Run id: 4abf12c8e7d6a9f3
+#   Wrote 12 trades to outputs/trades.csv
+#   Wrote summary to outputs/summary.csv
+#
+# `ls outputs/` should show (plus run markers):
+#   events.jsonl  log_returns.csv  metrics.json  summary.csv  trades.csv
 
 # 2. CSV input
 crypto-portfolio --prices-csv /path/to/prices.csv --date-col date --output-dir outputs --run-dir runs
