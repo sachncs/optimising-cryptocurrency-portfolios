@@ -126,10 +126,9 @@ def optimize_maximum_sharpe_ratio(
         portfolio_variance = float(weights @ covariance_matrix @ weights)
         portfolio_std = np.sqrt(max(portfolio_variance, LEDOIT_WOLF_DENOMINATOR_FLOOR))
         safe_variance = max(portfolio_variance, LEDOIT_WOLF_DENOMINATOR_FLOOR)
-        gradient = (
-            mean_returns / portfolio_std
-            - (portfolio_return - daily_risk_free_rate) * (covariance_matrix @ weights) / (portfolio_std * safe_variance)
-        )
+        gradient = mean_returns / portfolio_std - (portfolio_return - daily_risk_free_rate) * (
+            covariance_matrix @ weights
+        ) / (portfolio_std * safe_variance)
         weights = project_weights_to_simplex(weights + learning_step * gradient)
     return pd.Series(weights, index=expected_returns.index)
 

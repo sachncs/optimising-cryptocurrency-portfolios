@@ -11,8 +11,13 @@ from .ccxt import (
 )
 from .csv import CsvIngestor
 from .synthetic import SyntheticIngestor
-from .yfinance import YFinanceConfig, YFinanceField, YFinanceIngestor, YFinanceInterval, fetch_yfinance_prices
-
+from .yfinance import (
+    YFinanceConfig,
+    YFinanceField,
+    YFinanceIngestor,
+    YFinanceInterval,
+    fetch_yfinance_prices,
+)
 
 __all__ = [
     "CCXTIngestorConfig",

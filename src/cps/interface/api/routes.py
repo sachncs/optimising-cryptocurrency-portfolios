@@ -120,7 +120,7 @@ def _package_version() -> str:
     try:
         import tomllib
     except ImportError:
-        import tomli as tomllib  # type: ignore[no-redef]
+        import tomli as tomllib
     from pathlib import Path
 
     pyproject_path = Path(__file__).resolve().parents[4] / "pyproject.toml"
