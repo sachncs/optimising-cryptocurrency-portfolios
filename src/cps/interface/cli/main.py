@@ -17,6 +17,7 @@ Both follow the convention:
 from __future__ import annotations
 
 import argparse
+import os
 import sys
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
@@ -138,8 +139,8 @@ def _add_cli_arguments(parser: argparse.ArgumentParser, available_forecast_metho
     """Register the canonical ``crypto-portfolio`` flag set on ``parser``."""
     parser.add_argument("--prices-csv", type=str, default="")
     parser.add_argument("--date-col", type=str, default="date")
-    parser.add_argument("--output-dir", type=str, default="outputs")
-    parser.add_argument("--run-dir", type=str, default="runs")
+    parser.add_argument("--output-dir", type=str, default=os.environ.get("CPS_OUTPUT_DIR", "outputs"))
+    parser.add_argument("--run-dir", type=str, default=os.environ.get("CPS_RUN_DIR", "runs"))
     parser.add_argument(
         "--source",
         choices=["auto", "synthetic", "csv", "yfinance"],
