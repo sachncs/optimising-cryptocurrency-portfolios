@@ -256,7 +256,7 @@ class PipelineService:
         """Run every strategy for one rebalance and update bookkeeping."""
         updated_portfolio: dict[str, Weights] = {}
         for spec in strategy_specs:
-            similarity = self._build_consensus_similarity(train_returns, spec, rebalance_index)
+            similarity, prediction = self._build_consensus_similarity(train_returns, spec, rebalance_index)
             similarity_key = ScenarioKey(spec.name, horizon, rebalance_index)
             similarity_matrices[str(similarity_key)] = similarity
 
@@ -273,8 +273,9 @@ class PipelineService:
 
             selected_train = train_returns[selected]
             selected_future = future_returns[selected]
-            mse = float(((selected_train - selected_train.mean(axis=0)) ** 2).mean().mean())
-            self.__context.governance.record_error(mse)
+            mse = self._forecast_mse(prediction, selected_future)
+            if mse is not None:
+                self.__context.governance.record_error(mse)
             if self.__context.governance.is_drift_detected():
                 self._emit(
                     PipelineEvent.FORECAST_DRIFT_DETECTED,
@@ -329,9 +330,15 @@ class PipelineService:
         train_returns: pd.DataFrame,
         strategy: StrategySpec,
         rebalance_index: int,
-    ) -> np.ndarray:
-        """Compute the consensus similarity matrix for one strategy at one rebalance."""
-        prediction = None
+    ) -> tuple[np.ndarray, pd.DataFrame | None]:
+        """Compute the consensus similarity matrix for one strategy at one rebalance.
+
+        Returns the similarity matrix and the prediction used inside the
+        consensus similarity (or ``None`` when the strategy is not
+        prediction-driven). The prediction is exposed so the caller can
+        evaluate forecast-vs-realised MSE.
+        """
+        prediction: pd.DataFrame | None = None
         if strategy.use_prediction:
             prediction = self.__forecast_service.forecast_matrix(
                 train_returns,
@@ -356,7 +363,21 @@ class PipelineService:
             graph = build_weighted_graph_from_distance(distance)
             seed = int(seeds[run_index])
             partitions.append(louvain_partition(graph, seed=seed))
-        return consensus_similarity_matrix(partitions, assets)
+        return consensus_similarity_matrix(partitions, assets), prediction
+
+    @staticmethod
+    def _forecast_mse(prediction: pd.DataFrame | None, realised: pd.DataFrame) -> float | None:
+        """Return the forecast-vs-realised MSE, or ``None`` when not measurable."""
+        if prediction is None or prediction.empty or realised.empty:
+            return None
+        common_assets = [asset for asset in prediction.columns if asset in realised.columns]
+        if not common_assets:
+            return None
+        n = min(len(prediction), len(realised))
+        if n == 0:
+            return None
+        diff = prediction.iloc[:n][common_assets].to_numpy(dtype=float) - realised.iloc[:n][common_assets].to_numpy(dtype=float)
+        return float(np.mean(diff * diff))
 
     def _select_assets(self, clusters: list[list[str]], rebalance_index: int) -> list[str]:
         """Draw one asset per cluster, deterministically seeded by ``rebalance_index``."""
