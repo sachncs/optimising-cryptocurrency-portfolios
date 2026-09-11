@@ -94,7 +94,14 @@ def optimize_maximum_sharpe_ratio(
     max_iterations: int = SHARPE_DEFAULT_MAX_ITERATIONS,
     learning_step: float = SHARPE_DEFAULT_LEARNING_STEP,
 ) -> pd.Series:
-    """Maximise the Sharpe ratio over the long-only unit simplex."""
+    """Maximise the Sharpe ratio over the long-only unit simplex.
+
+    The gradient ascent step uses the standard analytic gradient of
+    ``(mu_w - r_f) / sigma_p``::
+
+        d/dw [(mu_w - r_f) / sigma_p]
+          = mu / sigma_p - (mu_w - r_f) * (Sigma w) / sigma_p**3
+    """
     mean_returns = expected_returns.to_numpy(dtype=float)
     covariance_matrix = covariance.to_numpy(dtype=float)
     assets_count = len(mean_returns)
@@ -106,10 +113,11 @@ def optimize_maximum_sharpe_ratio(
         portfolio_return = float(weights @ mean_returns)
         portfolio_variance = float(weights @ covariance_matrix @ weights)
         portfolio_std = np.sqrt(max(portfolio_variance, LEDOIT_WOLF_DENOMINATOR_FLOOR))
+        safe_variance = max(portfolio_variance, LEDOIT_WOLF_DENOMINATOR_FLOOR)
         gradient = (
-            mean_returns * portfolio_std
-            - (portfolio_return - daily_risk_free_rate) * (covariance_matrix @ weights) / portfolio_std
-        ) / max(portfolio_variance, LEDOIT_WOLF_DENOMINATOR_FLOOR)
+            mean_returns / portfolio_std
+            - (portfolio_return - daily_risk_free_rate) * (covariance_matrix @ weights) / (portfolio_std * safe_variance)
+        )
         weights = project_weights_to_simplex(weights + learning_step * gradient)
     return pd.Series(weights, index=expected_returns.index)
 
