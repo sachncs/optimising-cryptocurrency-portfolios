@@ -44,6 +44,7 @@ from ..domain import (
     RiskLimits,
     RunArtifacts,
     ScenarioKey,
+    Weights,
     build_weighted_graph_from_distance,
     consensus_similarity_matrix,
     correlation_distance_matrix,
@@ -374,7 +375,9 @@ class PipelineService:
         n = min(len(prediction), len(realised))
         if n == 0:
             return None
-        diff = prediction.iloc[:n][common_assets].to_numpy(dtype=float) - realised.iloc[:n][common_assets].to_numpy(dtype=float)
+        diff = prediction.iloc[:n][common_assets].to_numpy(dtype=float) - realised.iloc[:n][common_assets].to_numpy(
+            dtype=float
+        )
         return float(np.mean(diff * diff))
 
     def _select_assets(self, clusters: list[list[str]], rebalance_index: int) -> list[str]:
@@ -401,7 +404,7 @@ class PipelineService:
         change the documented semantics without changing the numerical
         ascent.
         """
-        return (1.0 + self.__config.risk_free_rate_annual) ** (1.0 / 365.0) - 1.0
+        return float((1.0 + self.__config.risk_free_rate_annual) ** (1.0 / 365.0) - 1.0)
 
     def __derive_risk_limits(self, config: PipelineConfig) -> RiskLimits:
         return RiskLimits(

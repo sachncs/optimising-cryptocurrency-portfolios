@@ -121,6 +121,9 @@ module = [
   "fastapi.*",
   "ccxt.*",
   "yfinance.*",
+  "pydantic.*",
+  "tomllib",
+  "tomli",
 ]
 ignore_missing_imports = true
 
