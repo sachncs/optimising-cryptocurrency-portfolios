@@ -12,7 +12,22 @@ requires-python = ">=3.10"
 authors = [
   {name = "Sachin <sachncs@gmail.com>"}
 ]
-keywords = ["cryptocurrency", "portfolio", "optimization", "consensus-clustering", "finance"]
+keywords = [
+  "cryptocurrency",
+  "portfolio",
+  "optimization",
+  "consensus-clustering",
+  "finance",
+  "louvain",
+  "correlation-network",
+  "sharpe-ratio",
+  "ledoit-wolf",
+  "garch",
+  "lstm",
+  "bitcoin",
+  "ethereum",
+  "quantitative-finance",
+]
 classifiers = [
   "Development Status :: 3 - Alpha",
   "Intended Audience :: Financial and Insurance Industry",
