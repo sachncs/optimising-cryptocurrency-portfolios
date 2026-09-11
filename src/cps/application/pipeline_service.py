@@ -390,8 +390,18 @@ class PipelineService:
             listener(event, payload)
 
     def __daily_risk_free_rate(self) -> float:
-        """Compound the annual risk-free rate to a daily rate using the configured Horizon."""
-        return self.__config.horizons[0].annual_to_daily_risk_free_rate(self.__config.risk_free_rate_annual)
+        """Compound the annual risk-free rate to a canonical daily rate.
+
+        Returns ``(1 + r_annual) ** (1 / 365) - 1``, the per-calendar-day
+        rate that compounds back to the annual rate over 365 days.
+        The rate is intentionally horizon-independent: every horizon in
+        ``self.__config.horizons`` gets the same daily rate, because the
+        Sharpe-ratio ascent is run once per rebalance rather than once
+        per (rebalance, horizon) and per-horizon scaling would only
+        change the documented semantics without changing the numerical
+        ascent.
+        """
+        return (1.0 + self.__config.risk_free_rate_annual) ** (1.0 / 365.0) - 1.0
 
     def __derive_risk_limits(self, config: PipelineConfig) -> RiskLimits:
         return RiskLimits(
