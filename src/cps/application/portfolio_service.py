@@ -28,6 +28,26 @@ from ..domain import (
 from ..domain.policies import RiskLimits, apply_weight_cap
 
 
+def _realised_turnover(weights: Weights, previous: Weights | None) -> float:
+    """Sum of absolute weight changes versus the previous portfolio.
+
+    Falls back to ``1.0`` for the first rebalance (no prior portfolio)
+    so the full bps cost is applied to a fresh deployment.
+    """
+    if previous is None:
+        return 1.0
+    keys = set(weights.mapping) | set(previous.mapping)
+    delta = 0.0
+    for asset in keys:
+        delta += abs(weights.mapping.get(asset, 0.0) - previous.mapping.get(asset, 0.0))
+    return delta
+
+
+def realised_turnover(weights: Weights, previous: Weights | None) -> float:
+    """Public wrapper for :func:`_realised_turnover`."""
+    return _realised_turnover(weights, previous)
+
+
 class PortfolioConstructionError(ValueError):
     """Raised when portfolio construction cannot produce a valid solution."""
 
@@ -56,6 +76,7 @@ class PortfolioService:
         selected_assets: list[str],
         train_returns: pd.DataFrame,
         future_returns: pd.DataFrame,
+        previous_weights: Weights | None = None,
     ) -> tuple[Weights, CovarianceMatrix, GrossReturn, NetReturn]:
         """Build the portfolio, validate it, and compute gross + net returns.
 
@@ -65,6 +86,11 @@ class PortfolioService:
                 assets.
             future_returns: Holding-window returns for the selected
                 assets.
+            previous_weights: Portfolio held at the previous rebalance.
+                When supplied, the execution cost scales with the L1
+                change versus the prior portfolio; the first rebalance
+                of a run has no previous portfolio and incurs the full
+                bps cost.
 
         Returns:
             ``(weights, covariance, gross_return, net_return)``.
@@ -91,10 +117,15 @@ class PortfolioService:
         self.__risk_limits.validate(selected_assets, weights, covariance)
 
         gross = GrossReturn(compute_portfolio_simple_return(future_returns, raw_weights))
-        turnover = weights.turnover
+        turnover = _realised_turnover(weights, previous_weights)
         cost_rate = compute_total_cost_rate(self.__cost_config, turnover)
         net = NetReturn.from_gross_and_cost(gross, cost_rate)
         return weights, covariance, gross, net
+
+    @staticmethod
+    def _turnover_fraction(weights: Weights, previous: Weights | None) -> float:
+        """Public helper for the L1 portfolio-turnover computation."""
+        return _realised_turnover(weights, previous)
 
     @staticmethod
     def annual_volatility(weights: Weights, covariance: CovarianceMatrix) -> float:
@@ -104,4 +135,4 @@ class PortfolioService:
         return float((w.to_numpy() @ cov_df.to_numpy() @ w.to_numpy()) ** 0.5 * (ANNUAL_TRADING_DAYS**0.5))
 
 
-__all__ = ["PortfolioConstructionError", "PortfolioService"]
+__all__ = ["PortfolioConstructionError", "PortfolioService", "realised_turnover"]

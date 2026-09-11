@@ -200,12 +200,13 @@ class PipelineService:
         horizon_market_by_strategy: dict[str, list[float]] = {spec.name: [] for spec in strategy_specs}
         horizon_trades: list[PortfolioResult] = []
         horizon_summaries: list[EvaluationSummary] = []
+        previous_portfolio: dict[str, Weights] = {}
 
         rebalance_index = self.__config.train_window_days
         while rebalance_index + horizon.days <= len(returns):
             train_returns = returns.iloc[rebalance_index - self.__config.train_window_days : rebalance_index]
             future_returns = returns.iloc[rebalance_index : rebalance_index + horizon.days]
-            self._run_rebalance(
+            new_previous = self._run_rebalance(
                 train_returns=train_returns,
                 future_returns=future_returns,
                 market_returns=future_returns.mean(axis=1),
@@ -219,7 +220,9 @@ class PipelineService:
                 horizon_trades_by_strategy=horizon_trades_by_strategy,
                 horizon_market_by_strategy=horizon_market_by_strategy,
                 horizon_trades=horizon_trades,
+                previous_portfolio=previous_portfolio,
             )
+            previous_portfolio.update(new_previous)
             rebalance_index += self.__config.rebalance_step_days
 
         for spec in strategy_specs:
@@ -248,8 +251,10 @@ class PipelineService:
         horizon_trades_by_strategy: dict[str, list[float]],
         horizon_market_by_strategy: dict[str, list[float]],
         horizon_trades: list[PortfolioResult],
-    ) -> None:
+        previous_portfolio: dict[str, Weights] | None = None,
+    ) -> dict[str, Weights]:
         """Run every strategy for one rebalance and update bookkeeping."""
+        updated_portfolio: dict[str, Weights] = {}
         for spec in strategy_specs:
             similarity = self._build_consensus_similarity(train_returns, spec, rebalance_index)
             similarity_key = ScenarioKey(spec.name, horizon, rebalance_index)
@@ -276,14 +281,18 @@ class PipelineService:
                     ForecastDriftPayload(history_points=len(self.__context.governance.snapshot())),
                 )
 
+            previous_weights = previous_portfolio.get(spec.name) if previous_portfolio else None
             try:
                 weights, _cov, gross, net = portfolio_service.build(
                     selected_assets=selected,
                     train_returns=selected_train,
                     future_returns=selected_future,
+                    previous_weights=previous_weights,
                 )
             except PortfolioConstructionError:
                 continue
+
+            updated_portfolio[spec.name] = weights
 
             market_trade = float(((1.0 + market_returns).prod()) - 1.0)
             horizon_trades_by_strategy[spec.name].append(net.value)
@@ -313,6 +322,7 @@ class PipelineService:
                     net_return=net.value,
                 ),
             )
+        return updated_portfolio
 
     def _build_consensus_similarity(
         self,
