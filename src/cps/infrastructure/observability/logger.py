@@ -21,6 +21,7 @@ from __future__ import annotations
 import contextlib
 import json
 import logging
+import os
 import sys
 from collections.abc import Callable
 from dataclasses import asdict
@@ -29,6 +30,15 @@ from pathlib import Path
 from ...domain.events import EventPayload, PipelineEvent
 
 EventListener = Callable[[PipelineEvent, EventPayload], None]
+
+_DEFAULT_LEVEL_NAME = "INFO"
+
+
+def _resolve_level() -> int:
+    """Resolve the logger level from ``CPS_LOG_LEVEL`` with an ``INFO`` default."""
+    raw = os.environ.get("CPS_LOG_LEVEL", _DEFAULT_LEVEL_NAME)
+    level = logging.getLevelName(raw.upper())
+    return level if isinstance(level, int) else logging.INFO
 
 
 class StructuredLogger:
@@ -44,15 +54,19 @@ class StructuredLogger:
                 on the first event when provided.
         """
         self.__logger = logging.getLogger(name)
-        self.__logger.setLevel(logging.INFO)
+        self.__logger.setLevel(_resolve_level())
         # Always attach our own stream handler so log lines land on stdout
         # regardless of what handlers the host application has already
         # configured. This avoids silently swallowing events when the
-        # only pre-existing handler is a NullHandler.
-        stream_handler = logging.StreamHandler(stream=sys.stdout)
-        stream_handler.setFormatter(logging.Formatter("%(message)s"))
-        stream_handler.set_name(f"cps:{name}:stdout")
-        self.__logger.addHandler(stream_handler)
+        # only pre-existing handler is a NullHandler. The handler is
+        # named so repeated constructions of a StructuredLogger with
+        # the same name share a single stream handler.
+        handler_name = f"cps:{name}:stdout"
+        if not any(getattr(existing, "name", None) == handler_name for existing in self.__logger.handlers):
+            stream_handler = logging.StreamHandler(stream=sys.stdout)
+            stream_handler.setFormatter(logging.Formatter("%(message)s"))
+            stream_handler.set_name(handler_name)
+            self.__logger.addHandler(stream_handler)
         self.__log_path = Path(log_path) if log_path else None
         self.__listeners: list[EventListener] = []
 
