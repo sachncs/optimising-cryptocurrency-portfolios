@@ -71,20 +71,32 @@ def compute_ledoit_wolf_constant_variance_covariance(
 def project_weights_to_simplex(weights: np.ndarray) -> np.ndarray:
     """Project an arbitrary weight vector onto the long-only unit simplex.
 
-    Held-Wolfe-Crowder sort-and-cumsum projection. The input is
-    declared "already on the simplex" only when the sum deviates from
-    1.0 by less than ``1e-12`` to avoid the early-return masking
-    near-simplex updates (typical 0.05-step gradient updates can
-    disturb the sum by ~1e-5 which is well within ``np.isclose``'s
-    default tolerance but still off the simplex).
+    Held-Wolfe-Crowder sort-and-cumsum projection. The projection is
+    only safe for inputs whose total mass is at least 1 -- when the
+    sum is below 1 (e.g. an all-zero gradient step or a near-zero
+    weight vector after a very small learning rate) the algorithm has
+    no solution and would raise ``IndexError`` from the empty
+    non-zero mask. In that case we fall back to the uniform simplex.
     """
+    weights = np.asarray(weights, dtype=float)
+    if weights.size == 0:
+        return weights
+    if weights.sum() <= 0.0:
+        return np.full(weights.shape, 1.0 / weights.size)
     if abs(float(weights.sum()) - 1.0) < 1e-12 and np.all(weights >= -1e-12):
         return np.maximum(weights, 0.0)
     sorted_weights = np.sort(weights)[::-1]
     cumulative_sum = np.cumsum(sorted_weights)
-    rho = np.nonzero(sorted_weights * np.arange(1, len(weights) + 1) > (cumulative_sum - 1))[0][-1]
+    mask = sorted_weights * np.arange(1, len(weights) + 1) > (cumulative_sum - 1)
+    if not mask.any():
+        return np.full(weights.shape, 1.0 / weights.size)
+    rho = int(np.nonzero(mask)[0][-1])
     theta = (cumulative_sum[rho] - 1) / (rho + 1)
-    return np.asarray(np.maximum(weights - theta, 0.0))
+    projected = np.maximum(weights - theta, 0.0)
+    total = projected.sum()
+    if total > 0:
+        projected = projected / total
+    return np.asarray(projected)
 
 
 def optimize_maximum_sharpe_ratio(
