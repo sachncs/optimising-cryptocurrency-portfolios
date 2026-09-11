@@ -362,8 +362,8 @@ publishes the source and wheel distributions.
 - [x] REST API interface (FastAPI, stateless)
 - [x] Multi-asset class support (yfinance ingestor)
 - [x] Docker containerization
-- [ ] Web dashboard
-- [ ] Streaming ingestion backplane (WebSocket / message broker)
+- [ ] Web dashboard — *Idea* (awaiting sponsor; not on the short-term plan)
+- [ ] Streaming ingestion backplane (WebSocket / message broker) — *Open for contribution* (small, well-scoped — open an issue to claim it)
 
 ---
 
