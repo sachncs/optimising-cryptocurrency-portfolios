@@ -331,6 +331,8 @@ class PipelineService:
             )
         partitions: list[list[set[str]]] = []
         assets = list(train_returns.columns)
+        seed_gen = np.random.default_rng(self.__config.random_seed + rebalance_index)
+        seeds = seed_gen.integers(0, 2**31 - 1, size=self.__config.consensus_runs)
         for run_index in range(self.__config.consensus_runs):
             shift = run_index if strategy.use_shifts else 0
             end_index = len(train_returns) - shift
@@ -342,7 +344,7 @@ class PipelineService:
                 window = pd.concat([window, prediction], axis=0, ignore_index=True)
             distance = correlation_distance_matrix(window)
             graph = build_weighted_graph_from_distance(distance)
-            seed = int(np.random.default_rng(self.__config.random_seed + rebalance_index).integers(0, 2**31 - 1))
+            seed = int(seeds[run_index])
             partitions.append(louvain_partition(graph, seed=seed))
         return consensus_similarity_matrix(partitions, assets)
 
