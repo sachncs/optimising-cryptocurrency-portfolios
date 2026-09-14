@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#050507"/>
+      <stop offset="100%" stop-color="#0e0e13"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="20%" cy="0%" r="80%">
+      <stop offset="0%" stop-color="#34d399" stop-opacity="0.35"/>
+      <stop offset="60%" stop-color="#34d399" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glow2" cx="100%" cy="100%" r="70%">
+      <stop offset="0%" stop-color="#a78bfa" stop-opacity="0.30"/>
+      <stop offset="60%" stop-color="#a78bfa" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="textGrad" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#d4d4d8"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#glow)"/>
+  <rect width="1200" height="630" fill="url(#glow2)"/>
+
+  <g transform="translate(80,80)">
+    <rect width="84" height="84" rx="18" fill="url(#bg)"/>
+    <rect x="0" y="0" width="84" height="84" rx="18" fill="#34d399"/>
+    <path d="M16 60l12-22 8 12 18-30" stroke="#03150e" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <circle cx="54" cy="20" r="4.2" fill="#03150e"/>
+    <text x="120" y="58" font-family="Inter, sans-serif" font-weight="700" font-size="34" fill="#fafafa">CPS</text>
+    <text x="120" y="86" font-family="Inter, sans-serif" font-weight="500" font-size="20" fill="#a1a1aa">Crypto Portfolio System</text>
+  </g>
+
+  <g transform="translate(80, 240)">
+    <text font-family="Inter, sans-serif" font-weight="700" font-size="92" fill="url(#textGrad)" letter-spacing="-3">
+      <tspan x="0" y="0">Crypto portfolios,</tspan>
+      <tspan x="0" y="110">built on consensus.</tspan>
+    </text>
+  </g>
+
+  <g transform="translate(80, 470)">
+    <text font-family="Inter, sans-serif" font-weight="400" font-size="26" fill="#a1a1aa">
+      <tspan x="0" y="0">Consensus Louvain · Ledoit-Wolf shrinkage · Sharpe ascent.</tspan>
+    </text>
+    <text font-family="Inter, sans-serif" font-weight="400" font-size="26" fill="#a1a1aa">
+      <tspan x="0" y="40">Production-grade. MIT licensed.</tspan>
+    </text>
+  </g>
+
+  <g transform="translate(80, 560)">
+    <rect width="220" height="44" rx="22" fill="#34d399"/>
+    <text x="110" y="29" text-anchor="middle" font-family="Inter, sans-serif" font-weight="600" font-size="17" fill="#03150e">Install with pip →</text>
+  </g>
+</svg>

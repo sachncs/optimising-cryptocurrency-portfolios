@@ -1,0 +1,12 @@
+{
+  "name": "CPS — Crypto Portfolio System",
+  "short_name": "CPS",
+  "description": "Production-grade consensus-clustered cryptocurrency portfolio construction.",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#050507",
+  "theme_color": "#050507"
+}

@@ -1,0 +1,80 @@
+---
+const lines = [
+  { type: "prompt", text: "$ pip install crypto-portfolio-system" },
+  { type: "info", text: "Successfully installed crypto-portfolio-system-0.1.0" },
+  { type: "blank", text: "" },
+  { type: "prompt", text: "$ crypto-portfolio --source yfinance \\" },
+  { type: "cont",  text: "    --symbols BTC-USD,ETH-USD,SOL-USD,ADA-USD \\" },
+  { type: "cont",  text: "    --period 6mo --consensus-runs 20" },
+  { type: "blank", text: "" },
+  { type: "out",   text: "▸ Ingested 1,834 price points across 4 symbols" },
+  { type: "out",   text: "▸ Fitted ARIMA(2,1,2) · horizon 7d" },
+  { type: "out",   text: "▸ Building rolling correlation networks · 60d window" },
+  { type: "out",   text: "▸ Running consensus Louvain (20 runs, τ=0.5)" },
+  { type: "out",   text: "  ✓ 5 stable communities · Jaccard 0.81" },
+  { type: "out",   text: "▸ Ledoit-Wolf shrinkage · λ=0.42" },
+  { type: "out",   text: "▸ Sharpe ascent · cap=0.35 · ceil=1.20" },
+  { type: "out",   text: "  ✓ weights {" },
+  { type: "kv",    text: "        BTC: 0.34,  ETH: 0.28,  SOL: 0.21,  ADA: 0.17 }" },
+  { type: "blank", text: "" },
+  { type: "ok",    text: "✔ Run 4abf12c8 complete → outputs/" },
+  { type: "muted", text: "  trades.csv · summary.csv · log_returns.csv · events.jsonl" },
+];
+---
+
+<div
+  class="code-block relative overflow-hidden"
+  role="img"
+  aria-label="Terminal preview showing the CPS CLI running a crypto-portfolio command"
+>
+  <div class="absolute inset-0 grain pointer-events-none"></div>
+
+  <div class="relative flex items-center justify-between border-b border-white/5 px-5 py-3.5">
+    <div class="flex items-center gap-1.5">
+      <span class="block h-2.5 w-2.5 rounded-full bg-[#ff5f57]"></span>
+      <span class="block h-2.5 w-2.5 rounded-full bg-[#febc2e]"></span>
+      <span class="block h-2.5 w-2.5 rounded-full bg-[#28c840]"></span>
+    </div>
+    <div class="mono flex items-center gap-2 text-[11px] text-ink-500">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M4 6h16v12H4z" stroke="currentColor" stroke-width="1.6"/>
+        <path d="M4 10h16" stroke="currentColor" stroke-width="1.6"/>
+      </svg>
+      zsh — cps@quant
+    </div>
+    <div class="flex items-center gap-2 text-ink-500">
+      <span class="hidden text-[11px] sm:inline">prod</span>
+      <span class="block h-1.5 w-1.5 rounded-full bg-signal-400 shadow-[0_0_8px_#34d399]"></span>
+    </div>
+  </div>
+
+  <div class="mono relative max-h-[460px] overflow-hidden p-5 text-[12px] leading-[1.7] text-ink-200 sm:p-6 sm:text-[13px]">
+    <pre class="whitespace-pre-wrap break-words"><code>{lines.map((l, i) => (
+      <>
+        <span class="block">
+          {l.type === "prompt" && (
+            <>
+              <span class="text-signal-400">❯ </span>
+              <span class="text-ink-50">{l.text.replace(/^\$\s/, "")}</span>
+            </>
+          )}
+          {l.type === "cont" && <span class="text-ink-50">{l.text}</span>}
+          {l.type === "info" && <span class="text-ink-400">{l.text}</span>}
+          {l.type === "out"   && <span class="text-ink-300">{l.text}</span>}
+          {l.type === "kv"    && <span class="text-violet-300">{l.text}</span>}
+          {l.type === "ok"    && <span class="text-signal-300">{l.text}</span>}
+          {l.type === "muted" && <span class="text-ink-500">{l.text}</span>}
+          {l.type === "blank" && <span>&nbsp;</span>}
+        </span>
+      </>
+    ))}</code></pre>
+
+    <div
+      aria-hidden="true"
+      class="pointer-events-none absolute inset-x-0 bottom-0 h-24"
+      style="background:linear-gradient(180deg,transparent,rgba(5,5,7,0.95));"
+    ></div>
+
+    <span class="absolute bottom-3 left-6 inline-block h-4 w-1.5 animate-pulse bg-signal-400/80" aria-hidden="true"></span>
+  </div>
+</div>

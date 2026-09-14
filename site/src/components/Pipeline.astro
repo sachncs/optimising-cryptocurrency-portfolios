@@ -1,0 +1,120 @@
+---
+const stages = [
+  {
+    n: "01",
+    title: "Ingest",
+    detail: "Wide price frames via synthetic, CSV, yfinance, or live ccxt polling.",
+    chips: ["CSV", "yfinance", "ccxt", "synthetic"],
+    tone: "signal",
+  },
+  {
+    n: "02",
+    title: "Clean & log-returns",
+    detail: "Calendar alignment, missing-value handling, and log-returns computation.",
+    chips: ["pandas", "NumPy"],
+    tone: "neutral",
+  },
+  {
+    n: "03",
+    title: "Forecast",
+    detail: "Naive, ARIMA, GARCH (AIC), and shared multi-asset LSTM with governance drift detection.",
+    chips: ["ARIMA", "GARCH", "LSTM"],
+    tone: "violet",
+  },
+  {
+    n: "04",
+    title: "Correlation networks",
+    detail: "Rolling correlation matrices → graph edges with NetworkX.",
+    chips: ["NetworkX"],
+    tone: "neutral",
+  },
+  {
+    n: "05",
+    title: "Consensus Louvain",
+    detail: "Stable clusters extracted across N runs with majority co-occurrence threshold τ.",
+    chips: ["Louvain", "consensus"],
+    tone: "signal",
+  },
+  {
+    n: "06",
+    title: "Sharpe ascent",
+    detail: "Ledoit-Wolf shrinkage, per-asset caps, vol ceiling, transaction & slippage.",
+    chips: ["Ledoit-Wolf", "constraints"],
+    tone: "violet",
+  },
+  {
+    n: "07",
+    title: "Artefacts",
+    detail: "Persistent, idempotent artefacts: trades, summary, log-returns, events, metrics.",
+    chips: ["trades.csv", "events.jsonl"],
+    tone: "neutral",
+  },
+];
+
+const glow = (tone: string) => {
+  if (tone === "signal") return "from-signal-500/40 to-signal-500/0";
+  if (tone === "violet") return "from-violet-400/40 to-violet-400/0";
+  return "from-white/15 to-white/0";
+};
+---
+
+<section id="pipeline" class="relative scroll-mt-28">
+  <div class="mx-auto max-w-7xl px-5 py-24 sm:px-8 sm:py-32">
+    <div class="mx-auto max-w-2xl text-center">
+      <span class="eyebrow reveal">Pipeline</span>
+      <h2 class="display reveal delay-100 mt-4 text-4xl text-balance text-ink-50 sm:text-5xl lg:text-6xl">
+        From price data to risk-aware portfolios.
+      </h2>
+      <p class="reveal delay-200 mx-auto mt-5 max-w-xl text-pretty text-lg text-ink-400">
+        A single, opinionated pipeline. Each stage is observable, deterministic, and independently testable.
+      </p>
+    </div>
+
+    <div class="reveal delay-300 relative mt-16 sm:mt-20">
+      <div
+        aria-hidden="true"
+        class="pointer-events-none absolute left-1/2 top-0 -z-10 h-full w-px -translate-x-1/2 bg-gradient-to-b from-transparent via-white/10 to-transparent"
+      ></div>
+
+      <ol class="relative space-y-3 sm:space-y-4">
+        {stages.map((s, i) => (
+          <li class="relative">
+            <div
+              class={`card group grid items-center gap-6 px-5 py-5 transition-all sm:grid-cols-12 sm:px-7 sm:py-6 hover:border-white/14 ${i % 2 === 0 ? "" : "lg:[&>*:first-child]:order-2"}`}
+            >
+              <div class="sm:col-span-3">
+                <div class="flex items-center gap-3">
+                  <span class="mono text-xs text-ink-500">{s.n}</span>
+                  <span class={`block h-px flex-1 bg-gradient-to-r ${glow(s.tone)}`}></span>
+                </div>
+                <div class="display mt-2 text-xl text-ink-50 sm:text-2xl">{s.title}</div>
+              </div>
+
+              <div class="sm:col-span-7">
+                <p class="text-[15px] text-ink-300">{s.detail}</p>
+              </div>
+
+              <div class="sm:col-span-2 sm:text-right">
+                <div class="flex flex-wrap gap-1.5 sm:justify-end">
+                  {s.chips.map((c) => (
+                    <span
+                      class={`mono rounded-full px-2.5 py-0.5 text-[11px] ${
+                        s.tone === "signal"
+                          ? "bg-signal-500/10 text-signal-300 ring-1 ring-inset ring-signal-500/20"
+                          : s.tone === "violet"
+                          ? "bg-violet-400/10 text-violet-300 ring-1 ring-inset ring-violet-400/20"
+                          : "bg-white/5 text-ink-300 ring-1 ring-inset ring-white/10"
+                      }`}
+                    >
+                      {c}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </div>
+</section>

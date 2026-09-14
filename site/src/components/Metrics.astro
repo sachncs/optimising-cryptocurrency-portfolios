@@ -1,0 +1,28 @@
+---
+const metrics = [
+  { label: "Forecasting methods", value: "4" },
+  { label: "Data sources", value: "4" },
+  { label: "Consensus runs", value: "20" },
+  { label: "Risk controls", value: "6" },
+  { label: "Output artefacts", value: "5" },
+  { label: "Python versions", value: "3" },
+];
+---
+
+<section class="relative">
+  <div class="divider"></div>
+  <div class="mx-auto max-w-7xl px-5 py-14 sm:px-8 sm:py-20">
+    <div class="reveal grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-3 lg:grid-cols-6">
+      {metrics.map((m) => (
+        <div class="text-center">
+          <div class="display text-3xl tracking-[-0.03em] text-ink-50 sm:text-4xl">
+            {m.value}
+            <span class="text-signal-400">.</span>
+          </div>
+          <div class="mt-1 text-xs uppercase tracking-[0.18em] text-ink-500">{m.label}</div>
+        </div>
+      ))}
+    </div>
+  </div>
+  <div class="divider"></div>
+</section>

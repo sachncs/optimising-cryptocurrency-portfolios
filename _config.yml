@@ -1,7 +1,0 @@
-title: "Crypto Portfolio System"
-description: "Consensus-clustered cryptocurrency portfolio construction, backtesting, and serving."
-theme: minima
-show_downloads: false
-permalink: /:title/
-plugins:
-  - jekyll-feed

@@ -58,3 +58,8 @@ runs/*.done
 
 # ruff
 .ruff_cache/
+
+# Frontend site (Astro)
+site/node_modules/
+site/dist/
+site/.astro/

@@ -1,0 +1,119 @@
+---
+const tiers = [
+  {
+    name: "Core",
+    desc: "The default install. Naive + ARIMA forecasting, FileArtifactStore, structured logging.",
+    price: "pip install",
+    cmd: "crypto-portfolio-system",
+    features: ["Naive & ARIMA forecasting", "Consensus Louvain clustering", "Sharpe-ascent with constraints", "Structured JSONL logging", "Metrics registry"],
+    cta: "PyPI",
+    href: "https://pypi.org/project/crypto-portfolio-system/",
+    highlight: false,
+  },
+  {
+    name: "Studio",
+    desc: "Everything in Core, plus GARCH volatility and a multi-asset LSTM forecaster.",
+    price: "pip install",
+    cmd: "crypto-portfolio-system[forecast-lstm,forecast-garch]",
+    features: ["Everything in Core", "GARCH with AIC order selection", "Multi-asset shared LSTM", "Forecast drift governance", "MSE telemetry on runs"],
+    cta: "Install Studio",
+    href: "#install",
+    highlight: true,
+  },
+  {
+    name: "Live",
+    desc: "Studio + live ccxt polling, yfinance ingest, and the FastAPI REST surface.",
+    price: "pip install",
+    cmd: "crypto-portfolio-system[all]",
+    features: ["Everything in Studio", "Live ccxt poller", "yfinance multi-asset ingestor", "Stateless FastAPI surface", "Docker-ready image"],
+    cta: "Install Live",
+    href: "#install",
+    highlight: false,
+  },
+];
+---
+
+<section id="install" class="relative scroll-mt-28">
+  <div class="absolute inset-x-0 top-0 -z-10 h-px bg-white/5"></div>
+
+  <div class="mx-auto max-w-7xl px-5 py-24 sm:px-8 sm:py-32">
+    <div class="mx-auto max-w-2xl text-center">
+      <span class="eyebrow reveal">Adopt</span>
+      <h2 class="display reveal delay-100 mt-4 text-4xl text-balance text-ink-50 sm:text-5xl">
+        Install in seconds. No accounts.
+      </h2>
+      <p class="reveal delay-200 mx-auto mt-5 max-w-xl text-pretty text-lg text-ink-400">
+        MIT licensed. Pay nothing. Add capabilities as you need them.
+      </p>
+    </div>
+
+    <div class="reveal delay-300 mt-14 grid gap-4 lg:grid-cols-3">
+      {tiers.map((t) => (
+        <div
+          class={`card relative overflow-hidden p-7 ${
+            t.highlight ? "ring-1 ring-inset ring-signal-500/30" : ""
+          }`}
+        >
+          {t.highlight && (
+            <div
+              aria-hidden="true"
+              class="pointer-events-none absolute -right-20 -top-20 h-56 w-56 rounded-full bg-signal-500/20 blur-3xl"
+            ></div>
+          )}
+          <div class="relative">
+            <div class="flex items-center justify-between">
+              <h3 class="text-lg font-semibold tracking-tight text-ink-50">{t.name}</h3>
+              {t.highlight && (
+                <span class="rounded-full bg-signal-500/15 px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-wider text-signal-300 ring-1 ring-inset ring-signal-500/30">
+                  Recommended
+                </span>
+              )}
+            </div>
+            <p class="mt-2 text-sm text-ink-400">{t.desc}</p>
+
+            <div class="code-block mt-5 px-3.5 py-2.5">
+              <code class="mono block text-[12px] text-ink-200">
+                <span class="text-signal-400">$ </span>
+                <span class="text-ink-50">{t.price}</span>{" "}
+                <span class="text-violet-300">{t.cmd}</span>
+              </code>
+            </div>
+
+            <ul class="mt-6 space-y-2.5 text-sm text-ink-300">
+              {t.features.map((f) => (
+                <li class="flex items-start gap-2.5">
+                  <span class={`mt-0.5 grid h-4 w-4 shrink-0 place-items-center rounded-full ${
+                    t.highlight ? "bg-signal-500/15 text-signal-300" : "bg-white/5 text-ink-300"
+                  }`}>
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path d="M5 12l5 5L20 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </span>
+                  <span>{f}</span>
+                </li>
+              ))}
+            </ul>
+
+            <a
+              href={t.href}
+              rel={t.href.startsWith("http") ? "noopener" : undefined}
+              target={t.href.startsWith("http") ? "_blank" : undefined}
+              class={`mt-7 inline-flex w-full items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium transition-all ${
+                t.highlight ? "btn-primary !w-full" : "btn-ghost !w-full"
+              }`}
+            >
+              {t.cta}
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <div class="reveal delay-400 mt-10 text-center text-sm text-ink-500">
+      All tiers ship under the MIT license. No telemetry. No accounts.
+    </div>
+  </div>
+</section>

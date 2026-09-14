@@ -1,0 +1,66 @@
+---
+const faqs = [
+  {
+    q: "How is this different from off-the-shelf backtesters?",
+    a: "CPS is a research-to-production pipeline, not a UI. Every stage (forecasting, Louvain consensus, optimisation, risk) is a first-class object you can compose, swap, or replace — without writing UI glue.",
+  },
+  {
+    q: "Does it ship with live trading?",
+    a: "No. CPS produces deterministic, idempotent artefacts — trades, summary, log-returns. Live trading is intentionally out of scope. The ccxt poller feeds the same wide price frame the pipeline expects.",
+  },
+  {
+    q: "Why consensus Louvain instead of one Louvain pass?",
+    a: "Louvain is stochastic. Running it N times and extracting co-occurring communities gives you a stability signal you can measure. The τ threshold controls how strict 'stable' is.",
+  },
+  {
+    q: "Which Python versions are supported?",
+    a: "Python 3.10, 3.11, and 3.12 — tested on every push. NumPy ≥1.24, pandas ≥2.0, NetworkX ≥3.1, statsmodels ≥0.14.",
+  },
+  {
+    q: "Can I run this in Docker?",
+    a: "Yes. A multi-stage Dockerfile is in the repo — small runtime image with optional extras pulled in via build args.",
+  },
+  {
+    q: "Is there a web dashboard?",
+    a: "Not yet — it's a known roadmap item awaiting sponsorship. CPS is CLI + REST first; visualisation belongs to whoever consumes the artefacts.",
+  },
+];
+---
+
+<section id="faq" class="relative scroll-mt-28">
+  <div class="mx-auto max-w-5xl px-5 py-24 sm:px-8 sm:py-32">
+    <div class="grid items-start gap-10 lg:grid-cols-12">
+      <div class="lg:col-span-4">
+        <span class="eyebrow reveal">Questions</span>
+        <h2 class="display reveal delay-100 mt-4 text-3xl text-balance text-ink-50 sm:text-4xl">
+          Answers,<br />without the fluff.
+        </h2>
+        <p class="reveal delay-200 mt-5 text-ink-400">
+          If something's missing, open an issue on GitHub. Or read the full{" "}
+          <a class="text-ink-200 underline underline-offset-4" href="https://github.com/sachncs/optimising-cryptocurrency-portfolios" target="_blank" rel="noopener">README</a>.
+        </p>
+      </div>
+      <div class="reveal delay-200 lg:col-span-8">
+        <ul class="space-y-2">
+          {faqs.map((f, i) => (
+            <li>
+              <details class="group card overflow-hidden" open={i === 0}>
+                <summary class="flex cursor-pointer list-none items-center justify-between gap-6 px-5 py-5 transition-colors hover:bg-white/[2px]">
+                  <span class="text-[15px] font-medium text-ink-50">{f.q}</span>
+                  <span class="grid h-7 w-7 shrink-0 place-items-center rounded-full border border-white/10 bg-white/5 text-ink-300 transition-transform group-open:rotate-45">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                    </svg>
+                  </span>
+                </summary>
+                <div class="px-5 pb-5 text-[15px] leading-relaxed text-ink-400">
+                  {f.a}
+                </div>
+              </details>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
